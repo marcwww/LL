@@ -6,6 +6,7 @@ def model_opts(parser):
     group = parser.add_argument_group('model')
     group.add_argument('-edim', type=int, default=50)
     group.add_argument('-hdim', type=int, default=50)
+    group.add_argument('-dropout', type=float, default=0.1)
 
 def train_opts(parser):
     group = parser.add_argument_group('train')

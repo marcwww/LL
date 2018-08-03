@@ -8,7 +8,7 @@ from torch.nn.utils.rnn import pad_packed_sequence,\
 
 class BaseRNN(nn.Module):
 
-    def __init__(self, voc_size, edim, hdim, padding_idx):
+    def __init__(self, voc_size, edim, hdim, dropout, padding_idx):
         super(BaseRNN, self).__init__()
 
         self.voc_size = voc_size
@@ -18,7 +18,8 @@ class BaseRNN(nn.Module):
         self.embedding = nn.Embedding(voc_size, edim,
                                       padding_idx=padding_idx)
 
-        self.rnn = nn.GRU(edim, hdim // 2 ,bidirectional=True)
+        self.rnn = nn.GRU(edim, hdim // 2 ,bidirectional=True,
+                          dropout=dropout)
         self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
                                     nn.LogSoftmax())
 

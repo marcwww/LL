@@ -43,6 +43,7 @@ if __name__ == '__main__':
     model = nets.BaseRNN(voc_size=len(TXT.vocab.itos),
                          edim=opt.edim,
                          hdim=opt.hdim,
+                         dropout=opt.dropout,
                          padding_idx=TXT.vocab.stoi[PAD]).to(device)
 
     utils.init_model(model)
