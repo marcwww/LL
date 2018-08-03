@@ -7,6 +7,7 @@ from torch.nn.utils import clip_grad_norm_
 import utils
 import torchtext
 import os
+import sys
 from macros import *
 
 def valid(model, valid_iter):
@@ -69,7 +70,8 @@ def train_domain(model, iters, opt, domain, criterion, optim):
         train_iter = iters['train']
         valid_iters = iters['valids'][:domain+1]
 
-        print('--'*10+('domain %d' % domain)+'--'*10, file=print_to)
+        print('--' * 10 + ('domain %d' % domain) + '--' * 10)
+        print('--' * 10 + ('domain %d' % domain) + '--' * 10, file=print_to)
         for epoch in range(opt.nepoch):
             for i, sample in enumerate(train_iter):
                 model.train()
@@ -87,10 +89,13 @@ def train_domain(model, iters, opt, domain, criterion, optim):
 
                 utils.progress_bar(i / len(train_iter), loss.item(), epoch)
 
+            print('\n')
             print('\n', file=print_to)
             for d, valid_iter in enumerate(valid_iters):
                 accurracy, precision, recall, f1 =\
                     valid(model, valid_iter)
+                print('Domain(%d/%d): a/p/r/f [%4f, %4f, %4f, %4f]' %
+                      (d, domain, accurracy, precision, recall, f1))
                 print('Domain(%d/%d): a/p/r/f [%4f, %4f, %4f, %4f]' %
                       (d, domain, accurracy, precision, recall, f1), file=print_to)
 
