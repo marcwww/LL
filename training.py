@@ -94,9 +94,9 @@ def train_domain(model, iters, opt, domain, criterion, optim):
             for d, valid_iter in enumerate(valid_iters):
                 accurracy, precision, recall, f1 =\
                     valid(model, valid_iter)
-                print('Epoch %d domain(%d/%d): a/p/r/f [%4f, %4f, %4f, %4f]' %
+                print('{\'Epoch\':%d, \'Domain\':\'(%d/%d)\', \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
                       (epoch, d, domain, accurracy, precision, recall, f1))
-                print('Epoch %d domain(%d/%d): a/p/r/f [%4f, %4f, %4f, %4f]' %
+                print('{\'Epoch\':%d, \'Domain\':\'(%d/%d)\', \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
                       (epoch, d, domain, accurracy, precision, recall, f1), file=print_to)
 
             print_to.flush()
