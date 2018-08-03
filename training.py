@@ -70,8 +70,10 @@ def train_domain(model, iters, opt, domain, criterion, optim):
         train_iter = iters['train']
         valid_iters = iters['valids'][:domain+1]
 
-        print('--' * 10 + ('domain %d' % domain) + '--' * 10)
-        print('--' * 10 + ('domain %d' % domain) + '--' * 10, file=print_to)
+        print('{\'domain\':%d}' % domain)
+        print('{\'domain\':%d}' % domain, file=print_to)
+        # print('--' * 10 + ('domain %d' % domain) + '--' * 10)
+        # print('--' * 10 + ('domain %d' % domain) + '--' * 10, file=print_to)
         for epoch in range(opt.nepoch):
             for i, sample in enumerate(train_iter):
                 model.train()
