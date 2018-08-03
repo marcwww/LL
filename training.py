@@ -89,7 +89,7 @@ def train_domain(model, iters, opt, domain, criterion, optim):
 
                 utils.progress_bar(i / len(train_iter), loss.item(), epoch)
 
-            print('\n')
+            print('\r')
             # print('\n', file=print_to)
             for d, valid_iter in enumerate(valid_iters):
                 accurracy, precision, recall, f1 =\
