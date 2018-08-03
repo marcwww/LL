@@ -5,7 +5,7 @@ import random
 import json
 import crash_on_ipy
 
-def build_iters(ftrain, fvalid, bsz, device, min_freq):
+def build_iters(ftrain, fvalid, skip_header, bsz, device, min_freq):
 
     TXT = torchtext.data.Field(sequential=True,
                                pad_token=PAD,
@@ -21,7 +21,7 @@ def build_iters(ftrain, fvalid, bsz, device, min_freq):
                                                   ('lbl', LBL),
                                                   ('rat', RAT),
                                                   ('txt', TXT)],
-                                          skip_header=True)
+                                          skip_header=skip_header)
 
     LBL.build_vocab(train)
     DOM.build_vocab(train)
@@ -32,17 +32,19 @@ def build_iters(ftrain, fvalid, bsz, device, min_freq):
                                                   ('lbl', LBL),
                                                   ('rat', RAT),
                                                   ('txt', TXT)],
-                                          skip_header=True)
+                                          skip_header=skip_header)
 
     train_iter = torchtext.data.Iterator(train, batch_size=bsz,
                                          sort=False, repeat=False,
                                          sort_key=lambda x:len(x.txt),
                                          sort_within_batch=True,
+                                         shuffle=False,
                                          device=device)
     valid_iter = torchtext.data.Iterator(valid, batch_size=bsz,
                                          sort=False, repeat=False,
                                          sort_key=lambda x: len(x.txt),
                                          sort_within_batch=True,
+                                         shuffle=False,
                                          device=device)
 
     return TXT, train_iter, valid_iter
@@ -82,8 +84,31 @@ def split(folder, ratio):
         'i2f':i2f,
         'ratio':ratio}
 
-    with open(os.path.join(root, 'info'), 'wt') as f:
+    with open(os.path.join(root, 'info.json'), 'wt') as f:
         f.write(json.dumps(info))
+
+def unify(folder, category='train'):
+
+    folder_pwd = os.path.join(DATA, folder)
+    info = json.loads(open(os.path.join(folder_pwd, INFO), "rt").read())
+    f2i = info['f2i']
+
+    lines = []
+    info[category + '_ranges'] = []
+    for fname, fidx in f2i.items():
+        with open(os.path.join(folder_pwd, str(fidx) + '.' + category), 'r') as f:
+            begin = len(lines)
+            lines_train = f.readlines()
+            lines.extend(lines_train)
+            end = len(lines)
+            info[category + '_ranges'].append((begin, end))
+
+    with open(os.path.join(folder_pwd, 'unify' + '.' +category), 'w') as f:
+        f.writelines(lines)
+
+    with open(os.path.join(folder_pwd, 'info.json'), 'wt') as f:
+        f.write(json.dumps(info))
+
 
 
 if __name__ == '__main__':
@@ -91,7 +116,10 @@ if __name__ == '__main__':
                  'valid':0.1,
                  'test':0.1})
 
-    # torchtext.data.batch()
+    unify(CHEN, 'train')
+    unify(CHEN, 'valid')
+    unify(CHEN, 'test')
+
 
 
 

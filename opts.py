@@ -9,8 +9,13 @@ def model_opts(parser):
 
 def train_opts(parser):
     group = parser.add_argument_group('train')
-    group.add_argument('-ftrain', type=str, default=os.path.join(CHEN, '0.train'))
-    group.add_argument('-fvalid', type=str, default=os.path.join(CHEN, '0.valid'))
+    # group.add_argument('-folder', type=str, default=CHEN)
+    # group.add_argument('-ftrain', type=str, default=os.path.join(CHEN, '0.train'))
+    # group.add_argument('-fvalid', type=str, default=os.path.join(CHEN, '0.valid'))
+    group.add_argument('-ftrain', type=str, default=os.path.join(CHEN, 'unify.train'))
+    group.add_argument('-fvalid', type=str, default=os.path.join(CHEN, 'unify.valid'))
+    group.add_argument('-ftest', type=str, default=os.path.join(CHEN, 'unify.test'))
+    group.add_argument('-finfo', type=str, default=os.path.join(CHEN, 'info'))
     group.add_argument('-bsz', type=int, default=4)
     group.add_argument('-min_freq', type=int, default=5)
     group.add_argument('-nepoch', type=int, default=10)
