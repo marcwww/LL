@@ -106,6 +106,10 @@ def train_domain(model, iters, opt, domain, criterion, optim):
 
 def train_ll(model, uiters, info, opt, criterion, optim):
 
+    flog = opt.name + '.log'
+    with open(os.path.join(RES, flog), 'w') as print_to:
+        pass
+
     utrain_iter = uiters['train']
     uvalid_iter = uiters['valid']
     train_ranges = info['train_ranges']
