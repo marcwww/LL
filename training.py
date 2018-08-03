@@ -99,6 +99,8 @@ def train_domain(model, iters, opt, domain, criterion, optim):
                 print('Domain(%d/%d): a/p/r/f [%4f, %4f, %4f, %4f]' %
                       (d, domain, accurracy, precision, recall, f1), file=print_to)
 
+            print_to.flush()
+
             if (epoch + 1) % opt.save_per == 0:
                 basename = "up-to-domain-{}-epoch-{}".format(domain, epoch)
                 model_fname = basename + ".model"
