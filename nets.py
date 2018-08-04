@@ -37,5 +37,36 @@ class BaseRNN(nn.Module):
         hidden = torch.cat([hidden[0], hidden[1]], dim=1)
         return self.toProbs(hidden)
 
+class BasePooling(nn.Module):
+
+    def __init__(self, voc_size, edim, hdim, dropout, padding_idx):
+        super(BasePooling, self).__init__()
+
+        self.voc_size = voc_size
+        self.edim = edim
+        self.hdim = hdim
+        self.padding_idx = padding_idx
+        self.embedding = nn.Embedding(voc_size, edim,
+                                      padding_idx=padding_idx)
+        self.linear = nn.Linear(hdim, hdim)
+        self.dropout = nn.Dropout(p=dropout)
+        self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
+                                     nn.LogSoftmax())
+
+    def forward(self, inputs):
+        seq_len, bsz = inputs.shape
+        embs = self.embedding(inputs)
+        mask = inputs.data.eq(self.padding_idx)
+        mask = mask.unsqueeze(-1).expand_as(embs)
+
+        embs = self.dropout(embs)
+        embs_affine = self.linear(embs)
+        embs_affine.masked_fill_(mask, -float('inf'))
+        h, _ = torch.max(embs_affine, dim=0, keepdim=False)
+
+        return self.toProbs(h)
+
+
+
 
 

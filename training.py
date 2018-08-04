@@ -197,9 +197,11 @@ def train_ll(model, uiters, info, opt, optim):
         valid_iters.append(valid_iter)
 
     for domain in domains:
-        weights = utils.balance_bias(train_iters[domain])
+
         location = opt.gpu if torch.cuda.is_available() and opt.gpu != -1 else 'cpu'
         device = torch.device(location)
+
+        weights = utils.balance_bias(train_iters[domain])
         criterion = nn.CrossEntropyLoss(weight=torch.Tensor(weights).to(device))
         train_domain(model, {'train': train_iters[domain],
                              'valids': valid_iters},

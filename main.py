@@ -44,11 +44,20 @@ if __name__ == '__main__':
                             min_freq=opt.min_freq,
                             device=opt.gpu)
 
-    model = nets.BaseRNN(voc_size=len(TXT.vocab.itos),
-                         edim=opt.edim,
-                         hdim=opt.hdim,
-                         dropout=opt.dropout,
-                         padding_idx=TXT.vocab.stoi[PAD]).to(device)
+    model = None
+
+    if opt.net == 'bigru':
+        model = nets.BaseRNN(voc_size=len(TXT.vocab.itos),
+                             edim=opt.edim,
+                             hdim=opt.hdim,
+                             dropout=opt.dropout,
+                             padding_idx=TXT.vocab.stoi[PAD]).to(device)
+    if opt.net == 'pooling':
+        model = nets.BasePooling(voc_size=len(TXT.vocab.itos),
+                             edim=opt.edim,
+                             hdim=opt.hdim,
+                             dropout=opt.dropout,
+                             padding_idx=TXT.vocab.stoi[PAD]).to(device)
 
     utils.init_model(model)
     if opt.pretrain:
