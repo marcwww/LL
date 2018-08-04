@@ -58,7 +58,7 @@ if __name__ == '__main__':
         lr=opt.lr, weight_decay=opt.wdecay)
 
     weights = utils.balance_bias(train_iter)
-    criterion = nn.CrossEntropyLoss(weight=torch.Tensor(weights))
+    criterion = nn.CrossEntropyLoss(weight=torch.Tensor(weights).to(device))
 
     folder_pwd = os.path.join(DATA, CHEN)
     info = json.loads(open(os.path.join(folder_pwd, INFO), "rt").read())
