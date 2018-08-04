@@ -84,7 +84,7 @@ def train_domain(model, iters, opt, domain, criterion, optim):
         # print('--' * 10 + ('domain %d' % domain) + '--' * 10, file=print_to)
 
         best_model = ''
-        best_performance = 0
+        best_f1 = 0
         best_metrics = {}
         best_epoch = 0
         for epoch in range(opt.nepoch):
@@ -110,13 +110,15 @@ def train_domain(model, iters, opt, domain, criterion, optim):
                     # valid
                     accurracy, precision, recall, f1 = \
                         valid(model, valid_iters[domain])
-                    if f1 > best_performance:
+                    print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
+                          (epoch, domain, accurracy, precision, recall, f1))
+                    if f1 > best_f1:
                         # save model
                         basename = "up-to-domain-{}-epoch-{}".format(domain, epoch)
                         model_fname = basename + ".model"
                         torch.save(model.state_dict(), model_fname)
 
-                        best_performance = f1
+                        best_f1 = f1
                         best_model = model_fname
                         best_metrics[domain] = (accurracy, precision, recall, f1)
                         best_epoch = epoch
@@ -133,13 +135,11 @@ def train_domain(model, iters, opt, domain, criterion, optim):
                                   (epoch, d, accurracy, precision, recall, f1))
 
                             best_metrics[d] = (accurracy, precision, recall, f1)
-                        # print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
-                        #       (epoch, d, accurracy, precision, recall, f1), file=print_to)
 
                     print_to.flush()
 
         # logging the best performance on the current domain
-        for d in range(domain):
+        for d in range(domain+1):
             accurracy, precision, recall, f1 = best_metrics[d]
             print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
                   (best_epoch, d, accurracy, precision, recall, f1), file=print_to)
@@ -196,6 +196,8 @@ def train_ll(model, uiters, info, opt, optim):
 
     for domain in domains:
         weights = utils.balance_bias(train_iters[domain])
+        location = opt.gpu if torch.cuda.is_available() and opt.gpu != -1 else 'cpu'
+        device = torch.device(location)
         criterion = nn.CrossEntropyLoss(weight=torch.Tensor(weights).to(device))
         train_domain(model, {'train': train_iters[domain],
                              'valids': valid_iters},
