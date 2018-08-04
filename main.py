@@ -32,8 +32,8 @@ if __name__ == '__main__':
     location = opt.gpu if torch.cuda.is_available() and opt.gpu != -1 else 'cpu'
     device = torch.device(location)
 
-    d0_train = os.path.join(CHEN, '12.train')
-    d0_valid = os.path.join(CHEN, '12.valid')
+    d0_train = os.path.join(CHEN, '0.train')
+    d0_valid = os.path.join(CHEN, '0.valid')
 
     TXT, train_iter, valid_iter = \
         preproc.build_iters(ftrain=d0_train,
