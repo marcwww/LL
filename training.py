@@ -34,9 +34,11 @@ def valid(model, valid_iter):
 
     return accurracy, precision, recall, f1
 
-def train(model, iters, opt, domain, criterion, optim):
+def train(model, iters, opt, domain, criterions, optim):
     train_iter = iters['train']
     valid_iter = iters['valid']
+    criterion = criterions['senti']
+    criterion_lm = criterions['lm']
 
     for epoch in range(opt.nepoch):
         for i, sample in enumerate(train_iter):
@@ -45,11 +47,23 @@ def train(model, iters, opt, domain, criterion, optim):
 
             model.zero_grad()
             # probs: (bsz, 3)
-            probs = model(txt)
+
+            logits=None
+            if model.with_lm:
+                probs, logits = model(txt[:-1])
+            else:
+                probs = model(txt)
 
             loss = criterion(probs, lbl.squeeze(0))
 
-            loss.backward()
+            if model.with_lm:
+                voc_size = model.embedding.num_embeddings
+                tar = txt[1:]
+                loss_lm = criterion_lm(logits.view(-1, voc_size), tar.view(-1))
+                (loss+loss_lm).backward()
+            else:
+                loss.backward()
+
             clip_grad_norm_(model.parameters(), 5)
             optim.step()
 

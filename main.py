@@ -70,6 +70,12 @@ if __name__ == '__main__':
                                 hdim=opt.hdim,
                                 dropout=opt.dropout,
                                 padding_idx=TXT.vocab.stoi[PAD]).to(device)
+    if opt.net == 'rnn_atten_lm':
+        model = nets.RNNAtteionLM(voc_size=len(TXT.vocab.itos),
+                                edim=opt.edim,
+                                hdim=opt.hdim,
+                                dropout=opt.dropout,
+                                padding_idx=TXT.vocab.stoi[PAD]).to(device)
 
     utils.init_model(model)
     if opt.pretrain:
@@ -80,6 +86,7 @@ if __name__ == '__main__':
 
     weights = utils.balance_bias(train_iter)
     criterion = nn.CrossEntropyLoss(weight=torch.Tensor(weights).to(device))
+    criterion_lm = nn.CrossEntropyLoss(ignore_index=TXT.vocab.stoi[PAD])
 
     folder_pwd = os.path.join(DATA, CHEN)
     info = json.loads(open(os.path.join(folder_pwd, INFO), "rt").read())
@@ -88,7 +95,7 @@ if __name__ == '__main__':
                    {'train':train_iter, 'valid':valid_iter},
                     opt,
                     0,
-                    criterion,
+                   {'senti':criterion, 'lm':criterion_lm},
                     optimizer)
 
 

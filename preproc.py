@@ -9,7 +9,8 @@ def build_iters(ftrain, fvalid, emb_pretrain, skip_header, bsz, device, min_freq
 
     TXT = torchtext.data.Field(sequential=True,
                                pad_token=PAD,
-                               unk_token=UNK)
+                               unk_token=UNK,
+                               eos_token=EOS)
 
     LBL = torchtext.data.Field(sequential=True, use_vocab=True, eos_token=None, pad_token=None, unk_token=None)
     DOM = torchtext.data.Field(sequential=True, use_vocab=True)

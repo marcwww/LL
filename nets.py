@@ -22,6 +22,8 @@ class BiRNN(nn.Module):
         self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
                                     nn.LogSoftmax())
 
+        self.with_lm = False
+
     def forward(self, inputs):
         seq_len, bsz = inputs.shape
         embs = self.embedding(inputs)
@@ -73,6 +75,8 @@ class RNNAtteion(nn.Module):
                                     nn.LogSoftmax())
         self.attention = Attention(hdim)
 
+        self.with_lm = False
+
     def forward(self, inputs):
         seq_len, bsz = inputs.shape
         embs = self.embedding(inputs)
@@ -108,6 +112,8 @@ class RNNAtteionLM(nn.Module):
                                     nn.LogSoftmax())
         self.attention = Attention(hdim)
 
+        self.with_lm = True
+
     def forward(self, inputs):
         seq_len, bsz = inputs.shape
         embs = self.embedding(inputs)
@@ -122,8 +128,11 @@ class RNNAtteionLM(nn.Module):
         hidden = self.attention(outputs, mask)
         # hidden = hidden.squeeze(0)
 
+        we_T = self.embedding.weight.transpose(0, 1)
+        logits = torch.matmul(outputs, we_T)
+
         # outputs: (seq_len, bsz, hdim)
-        return self.toProbs(hidden), outputs
+        return self.toProbs(hidden), logits
 
 class MaxPooling(nn.Module):
 
@@ -140,6 +149,8 @@ class MaxPooling(nn.Module):
         self.dropout = nn.Dropout(p=dropout)
         self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
                                      nn.LogSoftmax())
+
+        self.with_lm = False
 
     def forward(self, inputs):
         seq_len, bsz = inputs.shape
@@ -169,6 +180,8 @@ class AvgPooling(nn.Module):
         self.dropout = nn.Dropout(p=dropout)
         self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
                                      nn.LogSoftmax())
+
+        self.with_lm = False
 
     def forward(self, inputs):
         seq_len, bsz = inputs.shape
