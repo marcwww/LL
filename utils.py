@@ -1,6 +1,25 @@
 import numpy as np
 from torch.nn.init import xavier_uniform_
 from collections import defaultdict
+import time
+import logging
+LOGGER = logging.getLogger(__name__)
+import torch
+import random
+
+def get_ms():
+    """Returns the current time in miliseconds."""
+    return time.time() * 1000
+
+def init_seed(seed=None):
+    """Seed the RNGs for predicatability/reproduction purposes."""
+    if seed is None:
+        seed = int(get_ms() // 1000)
+
+    LOGGER.info("Using seed=%d", seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    random.seed(seed)
 
 def grad_norm(parameters, norm_type=2):
     total_norm = 0
