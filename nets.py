@@ -37,6 +37,37 @@ class BiRNN(nn.Module):
         hidden = torch.cat([hidden[0], hidden[1]], dim=1)
         return self.toProbs(hidden)
 
+class RNNAtteion(nn.Module):
+
+    def __init__(self, voc_size, edim, hdim, dropout, padding_idx):
+        super(RNNAtteion, self).__init__()
+
+        self.voc_size = voc_size
+        self.edim = edim
+        self.hdim = hdim
+        self.padding_idx = padding_idx
+        self.embedding = nn.Embedding(voc_size, edim,
+                                      padding_idx=padding_idx)
+
+        self.rnn = nn.GRU(edim, hdim,
+                          dropout=dropout)
+        self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
+                                    nn.LogSoftmax())
+
+    def forward(self, inputs):
+        seq_len, bsz = inputs.shape
+        embs = self.embedding(inputs)
+        mask = inputs.data.eq(self.padding_idx)
+        input_lens = seq_len - mask.sum(dim=0)
+
+        embs_p = pack_padded_sequence(embs, input_lens)
+        # hidden: (bsz, hdim)
+        outputs_p, hidden = self.rnn(embs_p)
+        hidden = hidden.squeeze(0)
+
+        # outputs: (seq_len, bsz, hdim)
+        return self.toProbs(hidden)
+
 class MaxPooling(nn.Module):
 
     def __init__(self, voc_size, edim, hdim, dropout, padding_idx):

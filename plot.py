@@ -34,7 +34,7 @@ with open(os.path.join(RES, flog), 'r') as f:
 
     print(domain_f1s)
 
-domain = range(20)
+domain = [5]
 
 for d, f1s in domain_f1s.items():
     if d in domain:
