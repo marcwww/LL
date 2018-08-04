@@ -20,7 +20,7 @@ def train_opts(parser):
     group.add_argument('-ftest', type=str, default=os.path.join(CHEN, 'unify.test'))
     group.add_argument('-finfo', type=str, default=os.path.join(CHEN, 'info'))
     group.add_argument('-bsz', type=int, default=4)
-    group.add_argument('-min_freq', type=int, default=5)
+    group.add_argument('-min_freq', type=int, default=1)
     group.add_argument('-nepoch', type=int, default=10)
     group.add_argument('-save_per', type=int, default=5)
     group.add_argument('-name', type=str, default='rnn_atten_lm')
