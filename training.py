@@ -23,9 +23,9 @@ def valid(model, valid_iter):
             # probs: (bsz, 3)
 
             if model.with_lm:
-                probs = model(txt)
+                probs, _ = model(txt[:-1])
             else:
-                probs, _ = model(txt)
+                probs = model(txt)
 
             pred = probs.max(dim=1)[1].cpu().numpy()
             lbl = lbl.cpu().numpy()
