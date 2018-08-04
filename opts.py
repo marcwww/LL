@@ -7,7 +7,8 @@ def model_opts(parser):
     group.add_argument('-edim', type=int, default=300)
     group.add_argument('-hdim', type=int, default=300)
     group.add_argument('-dropout', type=float, default=0.3)
-    group.add_argument('-pretrain', type=str, default="glove.6B.300d")
+    # group.add_argument('-pretrain', type=str, default="glove.6B.300d")
+    group.add_argument('-pretrain', type=str, default=None)
 
 def train_opts(parser):
     group = parser.add_argument_group('train')
