@@ -202,7 +202,7 @@ def train_ll(model, uiters, info, opt, optim):
         device = torch.device(location)
 
         weights = utils.balance_bias(train_iters[domain])
-        print(weights.data.numpy())
+        print(weights)
         criterion = nn.CrossEntropyLoss(weight=torch.Tensor(weights).to(device))
         train_domain(model, {'train': train_iters[domain],
                              'valids': valid_iters},
