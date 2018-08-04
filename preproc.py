@@ -5,7 +5,7 @@ import random
 import json
 import crash_on_ipy
 
-def build_iters(ftrain, fvalid, skip_header, bsz, device, min_freq):
+def build_iters(ftrain, fvalid, emb_pretrain, skip_header, bsz, device, min_freq):
 
     TXT = torchtext.data.Field(sequential=True,
                                pad_token=PAD,
@@ -25,7 +25,7 @@ def build_iters(ftrain, fvalid, skip_header, bsz, device, min_freq):
 
     LBL.build_vocab(train)
     DOM.build_vocab(train)
-    TXT.build_vocab(train, min_freq=min_freq, vectors="glove.6B.100d")
+    TXT.build_vocab(train, min_freq=min_freq, vectors=emb_pretrain)
     valid = torchtext.data.TabularDataset(path=os.path.join(DATA, fvalid),
                                           format='tsv',
                                           fields=[('dom', DOM),

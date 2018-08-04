@@ -38,6 +38,7 @@ if __name__ == '__main__':
     TXT, train_iter, valid_iter = \
         preproc.build_iters(ftrain=d0_train,
                             fvalid=d0_valid,
+                            emb_pretrain=opt.pretrain,
                             skip_header=False,
                             bsz=opt.bsz,
                             min_freq=opt.min_freq,
