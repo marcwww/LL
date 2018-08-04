@@ -32,9 +32,12 @@ if __name__ == '__main__':
     location = opt.gpu if torch.cuda.is_available() and opt.gpu != -1 else 'cpu'
     device = torch.device(location)
 
-    TXT, utrain_iter, uvalid_iter = \
-        preproc.build_iters(ftrain=opt.ftrain,
-                            fvalid=opt.fvalid,
+    d0_train = os.path.join(CHEN, '0.train')
+    d0_valid = os.path.join(CHEN, '0.valid')
+
+    TXT, train_iter, valid_iter = \
+        preproc.build_iters(ftrain=d0_train,
+                            fvalid=d0_valid,
                             skip_header=False,
                             bsz=opt.bsz,
                             min_freq=opt.min_freq,
@@ -56,12 +59,12 @@ if __name__ == '__main__':
     folder_pwd = os.path.join(DATA, CHEN)
     info = json.loads(open(os.path.join(folder_pwd, INFO), "rt").read())
 
-    training.train_ll(model,
-                      {'train':utrain_iter, 'valid':uvalid_iter},
-                      info,
-                      opt,
-                      criterion,
-                      optimizer)
+    training.train(model,
+                   {'train':train_iter, 'valid':valid_iter},
+                    opt,
+                    0,
+                    criterion,
+                    optimizer)
 
 
 

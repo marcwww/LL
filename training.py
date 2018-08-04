@@ -52,10 +52,17 @@ def train(model, iters, opt, domain, criterion, optim):
             clip_grad_norm_(model.parameters(), 5)
             optim.step()
 
-            utils.progress_bar(i / len(train_iter), loss.item(), epoch)
-        print('\n')
+            percent = i/len(train_iter)
 
-        print(valid(model, valid_iter))
+            utils.progress_bar(percent, loss.item(), epoch)
+
+            if (i+1) % 50 == 0 :
+                # print('\r')
+                accurracy, precision, recall, f1 = \
+                    valid(model, valid_iter)
+                print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%.4f, %.4f, %.4f, %.4f]}' %
+                      (epoch, domain, accurracy, precision, recall, f1))
+
 
         if (epoch + 1) % opt.save_per == 0:
             basename = "up-to-domain-{}-epoch-{}".format(domain, epoch)

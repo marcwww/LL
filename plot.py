@@ -24,19 +24,28 @@ with open(os.path.join(RES, flog), 'r') as f:
 
     domain_f1s = {}
     for i in range(len(domain_pos) - 1):
+        domain_f1s[i] = []
         begin = domain_pos[i]
         end = domain_pos[i+1]
         records = maps[begin:end]
         for record in records:
-            dom, f1 = record['Domain'], record['Metrics'][-1]
+            dom, f1 = record['Domain'], record['Metrics'][0]
+            domain_f1s[dom].append(f1)
 
+    print(domain_f1s)
 
+nepoch = 10
 
+for d, f1s in domain_f1s.items():
+    x = np.array(range(0, len(f1s), 10)) + d * nepoch
+    y = [f1s[i] for i in range(0, len(f1s), 10)]
+    plt.plot(x, y, label='d{}'.format(d))
+    break
 
-
-
-
-
+plt.yticks(np.arange(0, 1, 0.1))
+plt.xticks(np.arange(0, 200, 10))
+plt.legend(loc=0)
+plt.show()
 
 #
 # loss = history[3]['loss']
