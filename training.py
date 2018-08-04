@@ -105,12 +105,11 @@ def train_domain(model, iters, opt, domain, criterion, optim):
                 utils.progress_bar(i / len(train_iter), loss.item(), epoch)
 
                 if (i + 1) % int(1 / 4 * len(train_iter)) == 0:
-                    print('\r')
-
                     # valid
                     accurracy, precision, recall, f1 = \
                         valid(model, valid_iters[domain])
                     if f1 > best_f1:
+                        print('\r')
                         print(
                             '{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
                             (epoch, domain, accurracy, precision, recall, f1))
