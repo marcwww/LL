@@ -82,6 +82,11 @@ def train_domain(model, iters, opt, domain, criterion, optim):
         print('{\'domain\':%d}' % domain, file=print_to)
         # print('--' * 10 + ('domain %d' % domain) + '--' * 10)
         # print('--' * 10 + ('domain %d' % domain) + '--' * 10, file=print_to)
+
+        best_model = ''
+        best_performance = 0
+        best_metrics = {}
+        best_epoch = 0
         for epoch in range(opt.nepoch):
             for i, sample in enumerate(train_iter):
                 model.train()
@@ -99,22 +104,49 @@ def train_domain(model, iters, opt, domain, criterion, optim):
 
                 utils.progress_bar(i / len(train_iter), loss.item(), epoch)
 
-            print('\r')
-            # print('\n', file=print_to)
-            for d, valid_iter in enumerate(valid_iters):
-                accurracy, precision, recall, f1 =\
-                    valid(model, valid_iter)
-                print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
-                      (epoch, d, accurracy, precision, recall, f1))
-                print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
-                      (epoch, d, accurracy, precision, recall, f1), file=print_to)
+                if (i + 1) % int(1 / 4 * len(train_iter)) == 0:
+                    print('\r')
 
-            print_to.flush()
+                    # valid
+                    accurracy, precision, recall, f1 = \
+                        valid(model, valid_iters[domain])
+                    if f1 > best_performance:
+                        # save model
+                        basename = "up-to-domain-{}-epoch-{}".format(domain, epoch)
+                        model_fname = basename + ".model"
+                        torch.save(model.state_dict(), model_fname)
 
-            if (epoch + 1) % opt.save_per == 0:
-                basename = "up-to-domain-{}-epoch-{}".format(domain, epoch)
-                model_fname = basename + ".model"
-                torch.save(model.state_dict(), model_fname)
+                        best_performance = f1
+                        best_model = model_fname
+                        best_metrics[domain] = (accurracy, precision, recall, f1)
+                        best_epoch = epoch
+
+                        # valid the rest
+                        for d, valid_iter in enumerate(valid_iters):
+                            if d == domain:
+                                continue
+
+                            accurracy, precision, recall, f1 =\
+                                valid(model, valid_iter)
+
+                            print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
+                                  (epoch, d, accurracy, precision, recall, f1))
+
+                            best_metrics[d] = (accurracy, precision, recall, f1)
+                        # print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
+                        #       (epoch, d, accurracy, precision, recall, f1), file=print_to)
+
+                    print_to.flush()
+
+        # logging the best performance on the current domain
+        for d in range(domain):
+            accurracy, precision, recall, f1 = best_metrics[d]
+            print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
+                  (best_epoch, d, accurracy, precision, recall, f1), file=print_to)
+
+    location = {'cuda:' + str(opt.gpu): 'cuda:' + str(opt.gpu)} if opt.gpu != -1 else 'cpu'
+    model_dict = torch.load(best_model, map_location=location)
+    model.load_state_dict(model_dict)
 
 def train_ll(model, uiters, info, opt, optim):
 
@@ -163,7 +195,7 @@ def train_ll(model, uiters, info, opt, optim):
         valid_iters.append(valid_iter)
 
     for domain in domains:
-        weights = utils.balance_bias(train_iter[domain])
+        weights = utils.balance_bias(train_iters[domain])
         criterion = nn.CrossEntropyLoss(weight=torch.Tensor(weights).to(device))
         train_domain(model, {'train': train_iters[domain],
                              'valids': valid_iters},
