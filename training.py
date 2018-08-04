@@ -9,6 +9,7 @@ import torchtext
 import os
 import sys
 from macros import *
+from torch import nn
 
 def valid(model, valid_iter):
     model.eval()
@@ -56,7 +57,7 @@ def train(model, iters, opt, domain, criterion, optim):
 
             utils.progress_bar(percent, loss.item(), epoch)
 
-            if (i+1) % 50 == 0 :
+            if (i+1) % int(1/4 * len(train_iter)) == 0 :
                 # print('\r')
                 accurracy, precision, recall, f1 = \
                     valid(model, valid_iter)
@@ -115,7 +116,7 @@ def train_domain(model, iters, opt, domain, criterion, optim):
                 model_fname = basename + ".model"
                 torch.save(model.state_dict(), model_fname)
 
-def train_ll(model, uiters, info, opt, criterion, optim):
+def train_ll(model, uiters, info, opt, optim):
 
     flog = opt.name + '.log'
     with open(os.path.join(RES, flog), 'w') as print_to:
@@ -162,6 +163,8 @@ def train_ll(model, uiters, info, opt, criterion, optim):
         valid_iters.append(valid_iter)
 
     for domain in domains:
+        weights = utils.balance_bias(train_iter[domain])
+        criterion = nn.CrossEntropyLoss(weight=torch.Tensor(weights).to(device))
         train_domain(model, {'train': train_iters[domain],
                              'valids': valid_iters},
                      opt, domain, criterion, optim)
