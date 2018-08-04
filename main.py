@@ -57,7 +57,8 @@ if __name__ == '__main__':
     optimizer = optim.Adam(params=filter(lambda p: p.requires_grad, model.parameters()),
         lr=opt.lr, weight_decay=opt.wdecay)
 
-    criterion = nn.CrossEntropyLoss()
+    weights = utils.balance_bias(train_iter)
+    criterion = nn.CrossEntropyLoss(weight=torch.Tensor(weights))
 
     folder_pwd = os.path.join(DATA, CHEN)
     info = json.loads(open(os.path.join(folder_pwd, INFO), "rt").read())

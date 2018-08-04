@@ -1,5 +1,6 @@
 import numpy as np
 from torch.nn.init import xavier_uniform_
+from collections import defaultdict
 
 def grad_norm(parameters, norm_type=2):
     total_norm = 0
@@ -8,6 +9,22 @@ def grad_norm(parameters, norm_type=2):
         total_norm += param_norm ** norm_type
     total_norm = total_norm ** (1. / norm_type)
     return total_norm
+
+def balance_bias(train_iter):
+
+    nlbls = defaultdict(int)
+    for batch in train_iter:
+        for lbl in batch.lbl.squeeze(0):
+            nlbls[lbl.item()] += 1
+
+    res = []
+    for i in range(len(nlbls)):
+        res.append(1/nlbls[i])
+
+    res = np.array(res)
+    res /= res.sum()
+
+    return res
 
 def shift_matrix(n):
     W_up = np.eye(n)
