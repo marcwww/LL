@@ -25,7 +25,7 @@ def build_iters(ftrain, fvalid, skip_header, bsz, device, min_freq):
 
     LBL.build_vocab(train)
     DOM.build_vocab(train)
-    TXT.build_vocab(train, min_freq=min_freq, vectors="glove.6B.300d")
+    TXT.build_vocab(train, min_freq=min_freq, vectors="glove.6B.100d")
     valid = torchtext.data.TabularDataset(path=os.path.join(DATA, fvalid),
                                           format='tsv',
                                           fields=[('dom', DOM),

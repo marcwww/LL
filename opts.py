@@ -4,8 +4,8 @@ import os
 
 def model_opts(parser):
     group = parser.add_argument_group('model')
-    group.add_argument('-edim', type=int, default=300)
-    group.add_argument('-hdim', type=int, default=300)
+    group.add_argument('-edim', type=int, default=100)
+    group.add_argument('-hdim', type=int, default=100)
     group.add_argument('-dropout', type=float, default=0.3)
 
 def train_opts(parser):
