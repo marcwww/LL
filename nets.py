@@ -5,7 +5,6 @@ from macros import *
 from torch.nn.utils.rnn import pad_packed_sequence,\
     pack_padded_sequence
 
-
 class BiRNN(nn.Module):
 
     def __init__(self, voc_size, edim, hdim, dropout, padding_idx):
@@ -37,6 +36,25 @@ class BiRNN(nn.Module):
         hidden = torch.cat([hidden[0], hidden[1]], dim=1)
         return self.toProbs(hidden)
 
+class Attention(nn.Module):
+
+    def __init__(self, hdim):
+        super(Attention, self).__init__()
+        self.hdim = hdim
+        self.generator = nn.Sequential(
+            nn.Linear(hdim, hdim),
+            nn.Tanh(),
+            nn.Linear(hdim, 1),
+            # nn.Softmax(dim=0)
+        )
+        self.softmax = nn.Softmax(dim=0)
+
+    def forward(self, inputs, mask):
+        a_raw = self.generator(inputs)
+        a_raw.masked_fill_(mask.unsqueeze(-1), -float('inf'))
+        a = self.softmax(a_raw)
+        return (inputs * a).sum(dim=0)
+
 class RNNAtteion(nn.Module):
 
     def __init__(self, voc_size, edim, hdim, dropout, padding_idx):
@@ -53,6 +71,7 @@ class RNNAtteion(nn.Module):
                           dropout=dropout)
         self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
                                     nn.LogSoftmax())
+        self.attention = Attention(hdim)
 
     def forward(self, inputs):
         seq_len, bsz = inputs.shape
@@ -63,10 +82,48 @@ class RNNAtteion(nn.Module):
         embs_p = pack_padded_sequence(embs, input_lens)
         # hidden: (bsz, hdim)
         outputs_p, hidden = self.rnn(embs_p)
-        hidden = hidden.squeeze(0)
+        outputs, output_lens = pad_packed_sequence(outputs_p)
+
+        hidden = self.attention(outputs, mask)
+        # hidden = hidden.squeeze(0)
 
         # outputs: (seq_len, bsz, hdim)
         return self.toProbs(hidden)
+
+class RNNAtteionLM(nn.Module):
+
+    def __init__(self, voc_size, edim, hdim, dropout, padding_idx):
+        super(RNNAtteionLM, self).__init__()
+
+        self.voc_size = voc_size
+        self.edim = edim
+        self.hdim = hdim
+        self.padding_idx = padding_idx
+        self.embedding = nn.Embedding(voc_size, edim,
+                                      padding_idx=padding_idx)
+
+        self.rnn = nn.GRU(edim, hdim,
+                          dropout=dropout)
+        self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
+                                    nn.LogSoftmax())
+        self.attention = Attention(hdim)
+
+    def forward(self, inputs):
+        seq_len, bsz = inputs.shape
+        embs = self.embedding(inputs)
+        mask = inputs.data.eq(self.padding_idx)
+        input_lens = seq_len - mask.sum(dim=0)
+
+        embs_p = pack_padded_sequence(embs, input_lens)
+        # hidden: (bsz, hdim)
+        outputs_p, hidden = self.rnn(embs_p)
+        outputs, output_lens = pad_packed_sequence(outputs_p)
+
+        hidden = self.attention(outputs, mask)
+        # hidden = hidden.squeeze(0)
+
+        # outputs: (seq_len, bsz, hdim)
+        return self.toProbs(hidden), outputs
 
 class MaxPooling(nn.Module):
 
