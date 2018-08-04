@@ -51,7 +51,8 @@ if __name__ == '__main__':
                          padding_idx=TXT.vocab.stoi[PAD]).to(device)
 
     utils.init_model(model)
-    model.embedding.weight.data.copy_(TXT.vocab.vectors)
+    if opt.pretrain:
+        model.embedding.weight.data.copy_(TXT.vocab.vectors)
 
     optimizer = optim.Adam(params=filter(lambda p: p.requires_grad, model.parameters()),
         lr=opt.lr, weight_decay=opt.wdecay)
