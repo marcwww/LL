@@ -110,9 +110,11 @@ def train_domain(model, iters, opt, domain, criterion, optim):
                     # valid
                     accurracy, precision, recall, f1 = \
                         valid(model, valid_iters[domain])
-                    print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
-                          (epoch, domain, accurracy, precision, recall, f1))
                     if f1 > best_f1:
+                        print(
+                            '{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
+                            (epoch, domain, accurracy, precision, recall, f1))
+
                         # save model
                         basename = "up-to-domain-{}-epoch-{}".format(domain, epoch)
                         model_fname = basename + ".model"
