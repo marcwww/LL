@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="248ba68f-9050-41e2-8544-03eecaaf4bcd" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/main_ll.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_ll.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/opts.py" beforeDir="false" afterPath="$PROJECT_DIR$/opts.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -59,7 +59,7 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="10" />
-          <entry key="py" value="9259" />
+          <entry key="py" value="9309" />
           <entry key="sh" value="23" />
         </counts>
       </usages-collector>
@@ -67,7 +67,7 @@
         <counts>
           <entry key="Bash" value="23" />
           <entry key="PLAIN_TEXT" value="10" />
-          <entry key="Python" value="9259" />
+          <entry key="Python" value="9309" />
         </counts>
       </usages-collector>
     </session>
@@ -86,11 +86,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main_ll.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="379">
-              <caret line="59" column="22" selection-start-line="59" selection-start-column="22" selection-end-line="59" selection-end-column="22" />
+              <caret line="59" column="28" selection-start-line="59" selection-start-column="28" selection-end-line="59" selection-end-column="28" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -131,11 +131,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/opts.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" column="61" lean-forward="true" selection-start-line="10" selection-start-column="61" selection-end-line="10" selection-end-column="61" />
+            <state relative-caret-position="450">
+              <caret line="30" column="52" selection-start-line="30" selection-start-column="52" selection-end-line="30" selection-end-column="52" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -208,11 +208,11 @@
         <option value="$PROJECT_DIR$/plot.py" />
         <option value="$PROJECT_DIR$/macros.py" />
         <option value="$PROJECT_DIR$/preproc.py" />
-        <option value="$PROJECT_DIR$/opts.py" />
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/training.py" />
         <option value="$PROJECT_DIR$/utils.py" />
         <option value="$PROJECT_DIR$/main_ll.py" />
+        <option value="$PROJECT_DIR$/opts.py" />
       </list>
     </option>
   </component>
@@ -445,7 +445,7 @@
     <frame x="0" y="23" width="1440" height="836" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1602289" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1602289" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -457,7 +457,7 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.3293011" />
-      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.7703863" visible="true" weight="0.23252688" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" sideWeight="0.7703863" visible="true" weight="0.23252688" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.22961374" side_tool="true" weight="0.42780027" />
       <window_info anchor="bottom" id="Python Console" order="11" />
       <window_info anchor="bottom" id="Database Changes" order="12" show_stripe_button="false" />
@@ -758,16 +758,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/opts.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="61" lean-forward="true" selection-start-line="10" selection-start-column="61" selection-end-line="10" selection-end-column="61" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -791,9 +781,19 @@
     <entry file="file://$PROJECT_DIR$/main_ll.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="379">
-          <caret line="59" column="22" selection-start-line="59" selection-start-column="22" selection-end-line="59" selection-end-column="22" />
+          <caret line="59" column="28" selection-start-line="59" selection-start-column="28" selection-end-line="59" selection-end-column="28" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/opts.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="30" column="52" selection-start-line="30" selection-start-column="52" selection-end-line="30" selection-end-column="52" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -57,7 +57,7 @@ if __name__ == '__main__':
     folder_pwd = os.path.join(DATA, CHEN)
     info = json.loads(open(os.path.join(folder_pwd, INFO), "rt").read())
 
-    utils.init_seed(10)
+    utils.init_seed(opt.seed)
 
     training.train_ll(model,
                       {'train':utrain_iter, 'valid':uvalid_iter},
