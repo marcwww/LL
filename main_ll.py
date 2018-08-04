@@ -67,6 +67,12 @@ if __name__ == '__main__':
                                 hdim=opt.hdim,
                                 dropout=opt.dropout,
                                 padding_idx=TXT.vocab.stoi[PAD]).to(device)
+    if opt.net == 'rnn_atten_lm':
+        model = nets.RNNAtteionLM(voc_size=len(TXT.vocab.itos),
+                                edim=opt.edim,
+                                hdim=opt.hdim,
+                                dropout=opt.dropout,
+                                padding_idx=TXT.vocab.stoi[PAD]).to(device)
 
     utils.init_model(model)
 
