@@ -9,7 +9,7 @@ import os
 import sys
 import demjson
 
-flog = 'bigru.log'
+flog = 'pooling.log'
 with open(os.path.join(RES, flog), 'r') as f:
     lines = f.readlines()
     maps = []
@@ -29,21 +29,21 @@ with open(os.path.join(RES, flog), 'r') as f:
         end = domain_pos[i+1]
         records = maps[begin:end]
         for record in records:
-            dom, f1 = record['Domain'], record['Metrics'][0]
+            dom, f1 = record['Domain'], record['Metrics'][-1]
             domain_f1s[dom].append(f1)
 
     print(domain_f1s)
 
-nepoch = 10
+domain = range(20)
 
 for d, f1s in domain_f1s.items():
-    x = np.array(range(0, len(f1s), 10)) + d * nepoch
-    y = [f1s[i] for i in range(0, len(f1s), 10)]
-    plt.plot(x, y, label='d{}'.format(d))
-    break
+    if d in domain:
+        x = np.array(range(0, len(f1s), 1)) + d * 1
+        y = [f1s[i] for i in range(0, len(f1s), 1)]
+        plt.plot(x, y, label='d{}'.format(d))
 
 plt.yticks(np.arange(0, 1, 0.1))
-plt.xticks(np.arange(0, 200, 10))
+plt.xticks(np.arange(0, 20, 1))
 plt.legend(loc=0)
 plt.show()
 

@@ -32,8 +32,8 @@ if __name__ == '__main__':
     location = opt.gpu if torch.cuda.is_available() and opt.gpu != -1 else 'cpu'
     device = torch.device(location)
 
-    d0_train = os.path.join(CHEN, '0.train')
-    d0_valid = os.path.join(CHEN, '0.valid')
+    d0_train = os.path.join(CHEN, '12.train')
+    d0_valid = os.path.join(CHEN, '12.valid')
 
     TXT, train_iter, valid_iter = \
         preproc.build_iters(ftrain=d0_train,
@@ -47,17 +47,24 @@ if __name__ == '__main__':
     model = None
 
     if opt.net == 'bigru':
-        model = nets.BaseRNN(voc_size=len(TXT.vocab.itos),
+        model = nets.BiRNN(voc_size=len(TXT.vocab.itos),
                              edim=opt.edim,
                              hdim=opt.hdim,
                              dropout=opt.dropout,
                              padding_idx=TXT.vocab.stoi[PAD]).to(device)
-    if opt.net == 'pooling':
-        model = nets.BasePooling(voc_size=len(TXT.vocab.itos),
+    if opt.net == 'max_pooling':
+        model = nets.MaxPooling(voc_size=len(TXT.vocab.itos),
                              edim=opt.edim,
                              hdim=opt.hdim,
                              dropout=opt.dropout,
                              padding_idx=TXT.vocab.stoi[PAD]).to(device)
+    if opt.net == 'avg_pooling':
+        model = nets.AvgPooling(voc_size=len(TXT.vocab.itos),
+                                edim=opt.edim,
+                                hdim=opt.hdim,
+                                dropout=opt.dropout,
+                                padding_idx=TXT.vocab.stoi[PAD]).to(device)
+
 
     utils.init_model(model)
     if opt.pretrain:

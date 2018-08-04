@@ -29,4 +29,4 @@ def train_opts(parser):
     # group.add_argument('-lm_coef', type=float, default=0.5)
     group.add_argument('-wdecay', type=float, default=0)
     group.add_argument('-seed', type=int, default=10)
-    group.add_argument('-net', type=str, default='pooling')
+    group.add_argument('-net', type=str, default='avg_pooling')

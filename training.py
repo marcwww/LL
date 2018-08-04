@@ -78,6 +78,7 @@ def train_domain(model, iters, opt, domain, criterion, optim):
         train_iter = iters['train']
         valid_iters = iters['valids'][:domain+1]
 
+        print('\r')
         print('{\'domain\':%d}' % domain)
         print('{\'domain\':%d}' % domain, file=print_to)
         # print('--' * 10 + ('domain %d' % domain) + '--' * 10)
@@ -201,6 +202,7 @@ def train_ll(model, uiters, info, opt, optim):
         device = torch.device(location)
 
         weights = utils.balance_bias(train_iters[domain])
+        print(weights.data.numpy())
         criterion = nn.CrossEntropyLoss(weight=torch.Tensor(weights).to(device))
         train_domain(model, {'train': train_iters[domain],
                              'valids': valid_iters},
