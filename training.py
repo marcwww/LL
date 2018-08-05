@@ -107,7 +107,7 @@ def train_domain(model, iters, opt, domain, criterion, optim):
         # print('--' * 10 + ('domain %d' % domain) + '--' * 10, file=print_to)
 
         best_model = ''
-        best_f1 = 0
+        best_performance = 0
         best_metrics = {}
         best_epoch = 0
         for epoch in range(opt.nepoch):
@@ -141,7 +141,12 @@ def train_domain(model, iters, opt, domain, criterion, optim):
                     # valid
                     accurracy, precision, recall, f1 = \
                         valid(model, valid_iters[domain])
-                    if f1 > best_f1:
+                    performance = {'accuracy':accurracy,
+                                   'precision':precision,
+                                   'recall':recall,
+                                   'f1':f1}
+
+                    if performance[opt.metric] > best_performance:
                         print('\r')
                         print(
                             '{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
@@ -152,7 +157,7 @@ def train_domain(model, iters, opt, domain, criterion, optim):
                         model_fname = basename + ".model"
                         torch.save(model.state_dict(), model_fname)
 
-                        best_f1 = f1
+                        best_performance = performance[opt.metric]
                         best_model = model_fname
                         best_metrics[domain] = (accurracy, precision, recall, f1)
                         best_epoch = epoch

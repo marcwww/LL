@@ -36,3 +36,4 @@ def train_opts(parser):
     group.add_argument('-seed', type=int, default=10)
     group.add_argument('-net', type=str, default='rnn_atten')
     group.add_argument('-test_domain', type=int, default=9)
+    group.add_argument('-metric', type=str, default='accuracy')
