@@ -2,8 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="248ba68f-9050-41e2-8544-03eecaaf4bcd" name="Default" comment="">
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/opts.py" beforeDir="false" afterPath="$PROJECT_DIR$/opts.py" afterDir="false" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,7 +18,11 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/LL$Unnamed.coverage" NAME="main Coverage Results" MODIFIED="1533267134763" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/LL$main_is.coverage" NAME="main_is Coverage Results" MODIFIED="1533285962924" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+<<<<<<< HEAD
     <SUITE FILE_PATH="coverage/LL$plot.coverage" NAME="plot Coverage Results" MODIFIED="1533485052036" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+=======
+    <SUITE FILE_PATH="coverage/LL$plot.coverage" NAME="plot Coverage Results" MODIFIED="1533386656093" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
     <SUITE FILE_PATH="coverage/LL$preproc.coverage" NAME="preproc Coverage Results" MODIFIED="1533459782343" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/LL$main_ll.coverage" NAME="main_ll Coverage Results" MODIFIED="1533460709686" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/LL$main_ris.coverage" NAME="main_ris Coverage Results" MODIFIED="1533302005265" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -56,7 +64,11 @@
           <entry key="Bash" value="3" />
           <entry key="Image" value="1" />
           <entry key="JSON" value="5" />
+<<<<<<< HEAD
           <entry key="PLAIN_TEXT" value="34" />
+=======
+          <entry key="PLAIN_TEXT" value="33" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
           <entry key="Python" value="63" />
           <entry key="PythonStub" value="1" />
         </counts>
@@ -64,16 +76,25 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="10" />
+<<<<<<< HEAD
           <entry key="gitignore" value="19" />
           <entry key="py" value="11656" />
+=======
+          <entry key="py" value="11496" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
           <entry key="sh" value="23" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="Bash" value="23" />
+<<<<<<< HEAD
           <entry key="PLAIN_TEXT" value="29" />
           <entry key="Python" value="11656" />
+=======
+          <entry key="PLAIN_TEXT" value="10" />
+          <entry key="Python" value="11496" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
         </counts>
       </usages-collector>
     </session>
@@ -83,8 +104,13 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main_ll.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="314">
               <caret line="107" column="18" lean-forward="true" selection-start-line="107" selection-start-column="18" selection-end-line="107" selection-end-column="18" />
+=======
+            <state relative-caret-position="389">
+              <caret line="112" selection-start-line="112" selection-end-line="112" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -116,8 +142,13 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/plot.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="224">
               <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
+=======
+            <state relative-caret-position="405">
+              <caret line="36" column="11" selection-start-line="36" selection-start-column="11" selection-end-line="36" selection-end-column="11" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -125,25 +156,44 @@
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="30">
               <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
-            </state>
-          </provider>
-        </entry>
-      </file>
+=======
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/macros.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="120">
               <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+<<<<<<< HEAD
+        <entry file="file://$PROJECT_DIR$/macros.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="120">
+              <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+=======
+        <entry file="file://$PROJECT_DIR$/training.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1710">
+              <caret line="125" selection-start-line="125" selection-end-line="125" />
+              <folding>
+                <element signature="e#0#12#0" expanded="true" />
+              </folding>
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+<<<<<<< HEAD
         <entry file="file://$PROJECT_DIR$/training.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="195">
@@ -156,6 +206,8 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+=======
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
         <entry file="file://$PROJECT_DIR$/preproc.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="930">
@@ -169,11 +221,19 @@
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/opts.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="324">
               <caret line="37" column="58" selection-start-line="37" selection-start-column="58" selection-end-line="37" selection-end-column="58" />
+=======
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/opts.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="274">
+              <caret line="36" column="61" lean-forward="true" selection-start-line="36" selection-start-column="61" selection-end-line="36" selection-end-column="61" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -217,16 +277,26 @@
         <option value="$PROJECT_DIR$/main_is.py" />
         <option value="$PROJECT_DIR$/train.py" />
         <option value="$PROJECT_DIR$/utils.py" />
+<<<<<<< HEAD
         <option value="$PROJECT_DIR$/main.py" />
+=======
+        <option value="$PROJECT_DIR$/training.py" />
+        <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/plot.py" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
         <option value="$PROJECT_DIR$/macros.py" />
         <option value="$PROJECT_DIR$/preproc.py" />
         <option value="$PROJECT_DIR$/nets.py" />
         <option value="$PROJECT_DIR$/main_ll.py" />
         <option value="$PROJECT_DIR$/download.sh" />
+<<<<<<< HEAD
         <option value="$PROJECT_DIR$/plot.py" />
         <option value="$PROJECT_DIR$/opts.py" />
         <option value="$PROJECT_DIR$/training.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
+=======
+        <option value="$PROJECT_DIR$/opts.py" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
       </list>
     </option>
   </component>
@@ -253,6 +323,11 @@
             <path>
               <item name="LL" type="b2602c69:ProjectViewProjectNode" />
               <item name="LL" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="LL" type="b2602c69:ProjectViewProjectNode" />
+              <item name="LL" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -286,7 +361,11 @@
       </list>
     </option>
   </component>
+<<<<<<< HEAD
   <component name="RunManager" selected="Python.plot">
+=======
+  <component name="RunManager" selected="Python.main_ll">
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
     <configuration name="main" type="PythonConfigurationType" factoryName="Python">
       <module name="LL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -429,9 +508,13 @@
     </list>
     <recent_temporary>
       <list>
+<<<<<<< HEAD
         <item itemvalue="Python.plot" />
+=======
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
         <item itemvalue="Python.main_ll" />
         <item itemvalue="Python.preproc" />
+        <item itemvalue="Python.plot" />
         <item itemvalue="Python.main_ris" />
         <item itemvalue="Python.main_is" />
       </list>
@@ -454,26 +537,42 @@
     <frame x="0" y="23" width="1440" height="836" extended-state="0" />
     <editor active="true" />
     <layout>
+<<<<<<< HEAD
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21816881" />
+=======
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21816881" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3284974" />
+<<<<<<< HEAD
       <window_info anchor="bottom" id="Run" order="2" weight="0.3077957" />
+=======
+      <window_info anchor="bottom" id="Run" order="2" weight="0.5201613" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4327957" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.3293011" />
+<<<<<<< HEAD
       <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.7703863" visible="true" weight="0.44354838" />
+=======
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" sideWeight="0.7703863" visible="true" weight="0.44354838" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.22961374" side_tool="true" weight="0.42780027" />
       <window_info anchor="bottom" id="Python Console" order="11" weight="0.3293011" />
       <window_info anchor="bottom" id="Database Changes" order="12" show_stripe_button="false" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+<<<<<<< HEAD
       <window_info anchor="right" id="SciView" order="3" visible="true" weight="0.3004292" />
+=======
+      <window_info anchor="right" id="SciView" order="3" weight="0.30472103" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
       <window_info anchor="right" id="Database" order="4" />
     </layout>
     <layout-to-restore>
@@ -510,6 +609,10 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
+<<<<<<< HEAD
+=======
+    <entry file="file://$PROJECT_DIR$/data/Keyboard.txt" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
     <entry file="file://$USER_HOME$/.pyenv/versions/atec36/lib/python3.6/site-packages/sklearn/metrics/classification.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="140">
@@ -685,6 +788,7 @@
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/main_is.py">
+<<<<<<< HEAD
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1290">
           <caret line="103" column="44" selection-start-line="103" selection-start-column="44" selection-end-line="103" selection-end-column="44" />
@@ -764,12 +868,65 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2460">
           <caret line="169" column="75" selection-start-line="169" selection-start-column="67" selection-end-line="169" selection-end-column="75" />
+=======
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1290">
+          <caret line="103" column="44" selection-start-line="103" selection-start-column="44" selection-end-line="103" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/fdu-mtl/apparel.task.train">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/fdu-mtl/MR.task.test">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="68" lean-forward="true" selection-start-line="13" selection-start-column="68" selection-end-line="13" selection-end-column="68" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/fdu-mtl/dvd.task.train">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="81" selection-start-line="11" selection-start-column="81" selection-end-line="11" selection-end-column="81" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/fdu-mtl/unify.train">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$USER_HOME$/.pyenv/versions/atec36/lib/python3.6/site-packages/torchtext/data/field.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="131">
+          <caret line="288" selection-start-line="288" selection-end-line="288" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/fdu-mtl/MR.task.train">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1410">
+          <caret line="94" column="53" selection-start-line="94" selection-start-column="53" selection-end-line="94" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/fdu-mtl/0.train">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/fdu-mtl/info.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main_ll.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="389">
+          <caret line="112" selection-start-line="112" selection-end-line="112" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/download.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
@@ -783,44 +940,107 @@
           <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
+=======
+    <entry file="file://$PROJECT_DIR$/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="34" column="27" selection-start-line="34" selection-start-column="17" selection-end-line="34" selection-end-column="27" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
           </folding>
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/main_ll.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="314">
           <caret line="107" column="18" lean-forward="true" selection-start-line="107" selection-start-column="18" selection-end-line="107" selection-end-column="18" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
+=======
+    <entry file="file://$PROJECT_DIR$/plot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="36" column="11" selection-start-line="36" selection-start-column="11" selection-end-line="36" selection-end-column="11" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/macros.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/training.py">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="195">
           <caret line="101" lean-forward="true" selection-start-line="101" selection-end-line="101" />
+=======
+        <state relative-caret-position="1710">
+          <caret line="125" selection-start-line="125" selection-end-line="125" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/opts.py">
+    <entry file="file://$PROJECT_DIR$/preproc.py">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="324">
           <caret line="37" column="58" selection-start-line="37" selection-start-column="58" selection-end-line="37" selection-end-column="58" />
+=======
+        <state relative-caret-position="930">
+          <caret line="68" column="4" selection-start-line="68" selection-start-column="4" selection-end-line="68" selection-end-column="4" />
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
           <folding>
-            <element signature="e#0#15#0" expanded="true" />
+            <element signature="e#0#16#0" expanded="true" />
+            <marker date="1533460293466" expanded="true" signature="5777:7339" ph="..." />
+            <marker date="1533460293466" expanded="true" signature="6541:7339" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
           <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+=======
+    <entry file="file://$PROJECT_DIR$/nets.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2460">
+          <caret line="169" column="75" selection-start-line="169" selection-start-column="67" selection-end-line="169" selection-end-column="75" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/download.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="44" lean-forward="true" selection-start-line="2" selection-start-column="44" selection-end-line="2" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/opts.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="274">
+          <caret line="36" column="61" lean-forward="true" selection-start-line="36" selection-start-column="61" selection-end-line="36" selection-end-column="61" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+>>>>>>> 281c0c5d1a04b8a24336360b303123a0e88bd9b9
         </state>
       </provider>
     </entry>
