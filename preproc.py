@@ -4,8 +4,9 @@ from macros import *
 import random
 import json
 import crash_on_ipy
+import codecs
 
-def build_iters(ftrain, fvalid, emb_pretrain, skip_header, bsz, device, min_freq):
+def build_iters_CHEN(ftrain, fvalid, emb_pretrain, skip_header, bsz, device, min_freq):
 
     TXT = torchtext.data.Field(sequential=True,
                                pad_token=PAD,
@@ -32,6 +33,44 @@ def build_iters(ftrain, fvalid, emb_pretrain, skip_header, bsz, device, min_freq
                                           fields=[('dom', DOM),
                                                   ('lbl', LBL),
                                                   ('rat', RAT),
+                                                  ('txt', TXT)],
+                                          skip_header=skip_header)
+
+    train_iter = torchtext.data.Iterator(train, batch_size=bsz,
+                                         sort=False, repeat=False,
+                                         sort_key=lambda x:len(x.txt),
+                                         sort_within_batch=True,
+                                         shuffle=False,
+                                         device=device)
+    valid_iter = torchtext.data.Iterator(valid, batch_size=bsz,
+                                         sort=False, repeat=False,
+                                         sort_key=lambda x: len(x.txt),
+                                         sort_within_batch=True,
+                                         shuffle=False,
+                                         device=device)
+
+    return TXT, train_iter, valid_iter
+
+def build_iters_MAN(ftrain, fvalid, emb_pretrain, skip_header, bsz, device, min_freq):
+
+    TXT = torchtext.data.Field(sequential=True,
+                               pad_token=PAD,
+                               unk_token=UNK,
+                               eos_token=EOS)
+
+    LBL = torchtext.data.Field(sequential=True, use_vocab=True, eos_token=None, pad_token=None, unk_token=None)
+
+    train = torchtext.data.TabularDataset(path=os.path.join(DATA, ftrain),
+                                          format='tsv',
+                                          fields=[('lbl', LBL),
+                                                  ('txt', TXT)],
+                                          skip_header=skip_header)
+
+    LBL.build_vocab(train)
+    TXT.build_vocab(train, min_freq=min_freq, vectors=emb_pretrain)
+    valid = torchtext.data.TabularDataset(path=os.path.join(DATA, fvalid),
+                                          format='tsv',
+                                          fields=[('lbl', LBL),
                                                   ('txt', TXT)],
                                           skip_header=skip_header)
 
@@ -110,16 +149,49 @@ def unify(folder, category='train'):
     with open(os.path.join(folder_pwd, 'info.json'), 'wt') as f:
         f.write(json.dumps(info))
 
+def index(folder, ratio, encoding='ISO-8859-2'):
+    root = os.path.join(DATA, folder)
+    f2i = {}
+    i2f = []
+    for fname in os.listdir(root):
+        fname_components = fname.split('.')
+        if len(fname_components) != 3:
+            continue
 
+        dname, suffix = fname_components[0], \
+                        fname_components[-1]
+        if dname not in f2i.keys():
+            f2i[dname] = len(f2i)
+            i2f.append(dname)
+
+        with open(os.path.join(root, fname), 'r', encoding=encoding) as f:
+            lines = f.readlines()
+
+        with open(os.path.join(root, str(f2i[dname])+'.'+str(suffix)), 'w') as f:
+            f.writelines(lines)
+
+    info = \
+        {'f2i': f2i,
+         'i2f': i2f,
+         'ratio': ratio}
+
+    with open(os.path.join(root, 'info.json'), 'wt') as f:
+        f.write(json.dumps(info))
 
 if __name__ == '__main__':
-    split(CHEN, {'train':0.8,
-                 'valid':0.1,
-                 'test':0.1})
+    # for CHEN:
+    # split(CHEN, {'train':0.8,
+    #              'valid':0.1,
+    #              'test':0.1})
+    #
+    # unify(CHEN, 'train')
+    # unify(CHEN, 'valid')
+    # unify(CHEN, 'test')
 
-    unify(CHEN, 'train')
-    unify(CHEN, 'valid')
-    unify(CHEN, 'test')
+    # for MAN:
+    index(MAN, {'train':0.8,'test':0.2,'valid':0})
+    unify(MAN, 'train')
+    unify(MAN, 'test')
 
 
 

@@ -9,7 +9,7 @@ import os
 import sys
 import demjson
 
-flog = 'pooling.log'
+flog = 'rnn_atten.log'
 with open(os.path.join(RES, flog), 'r') as f:
     lines = f.readlines()
     maps = []
@@ -34,7 +34,8 @@ with open(os.path.join(RES, flog), 'r') as f:
 
     print(domain_f1s)
 
-domain = [5]
+domain = [4]
+# domain = range(20)
 
 for d, f1s in domain_f1s.items():
     if d in domain:
