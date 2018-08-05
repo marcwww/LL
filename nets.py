@@ -69,6 +69,8 @@ class RNNAtteion(nn.Module):
         self.embedding = nn.Embedding(voc_size, edim,
                                       padding_idx=padding_idx)
 
+        self.embedding.weight.requires_grad=False
+
         self.rnn = nn.GRU(edim, hdim,
                           dropout=dropout)
         self.toProbs = nn.Sequential(nn.Linear(hdim, nclasses),

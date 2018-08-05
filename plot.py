@@ -8,6 +8,7 @@ import json
 import os
 import sys
 import demjson
+import crash_on_ipy
 
 flog = 'rnn_atten.log'
 with open(os.path.join(RES, flog), 'r') as f:
@@ -30,11 +31,13 @@ with open(os.path.join(RES, flog), 'r') as f:
         records = maps[begin:end]
         for record in records:
             dom, f1 = record['Domain'], record['Metrics'][-1]
+            if dom not in domain_f1s.keys():
+                domain_f1s[dom] = []
             domain_f1s[dom].append(f1)
 
     print(domain_f1s)
 
-domain = [9]
+domain = [0]
 # domain = range(20)
 
 for d, f1s in domain_f1s.items():
