@@ -95,8 +95,8 @@ def train_domain(model, iters, opt, domain, criterion, optim):
     with open(os.path.join(RES, flog), 'a+') as print_to:
 
         train_iter = iters['train']
-        # valid_iters = iters['valids'][:domain+1]
-        valid_iters = iters['valids']
+        valid_iters = iters['valids'][:domain+1]
+        # valid_iters = iters['valids']
 
         TXT = train_iter.dataset.fields['txt']
         criterion_lm = nn.CrossEntropyLoss(ignore_index=TXT.vocab.stoi[PAD])
