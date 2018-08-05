@@ -196,7 +196,10 @@ def train_ll(model, uiters, info, opt, optim):
     bsz = utrain_iter.batch_size
     device = utrain_iter.device
 
-    domains = range(len(train_ranges))
+    domains = [opt.test_domain]
+    for d in range(len(train_ranges)):
+        if d != opt.test_domain:
+            domains.append(d)
 
     examples_utrain = utrain_iter.dataset.examples
     examples_uvalid = uvalid_iter.dataset.examples

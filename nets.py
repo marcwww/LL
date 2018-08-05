@@ -7,7 +7,7 @@ from torch.nn.utils.rnn import pad_packed_sequence,\
 
 class BiRNN(nn.Module):
 
-    def __init__(self, voc_size, edim, hdim, dropout, padding_idx):
+    def __init__(self, voc_size, edim, hdim, dropout, padding_idx, nclasses):
         super(BiRNN, self).__init__()
 
         self.voc_size = voc_size
@@ -19,7 +19,7 @@ class BiRNN(nn.Module):
 
         self.rnn = nn.GRU(edim, hdim // 2 ,bidirectional=True,
                           dropout=dropout)
-        self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
+        self.toProbs = nn.Sequential(nn.Linear(hdim, nclasses),
                                     nn.LogSoftmax())
 
         self.with_lm = False
@@ -59,7 +59,7 @@ class Attention(nn.Module):
 
 class RNNAtteion(nn.Module):
 
-    def __init__(self, voc_size, edim, hdim, dropout, padding_idx):
+    def __init__(self, voc_size, edim, hdim, dropout, padding_idx, nclasses):
         super(RNNAtteion, self).__init__()
 
         self.voc_size = voc_size
@@ -71,7 +71,7 @@ class RNNAtteion(nn.Module):
 
         self.rnn = nn.GRU(edim, hdim,
                           dropout=dropout)
-        self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
+        self.toProbs = nn.Sequential(nn.Linear(hdim, nclasses),
                                     nn.LogSoftmax())
         self.attention = Attention(hdim)
 
@@ -96,7 +96,7 @@ class RNNAtteion(nn.Module):
 
 class RNNAtteionLM(nn.Module):
 
-    def __init__(self, voc_size, edim, hdim, dropout, padding_idx):
+    def __init__(self, voc_size, edim, hdim, dropout, padding_idx, nclasses):
         super(RNNAtteionLM, self).__init__()
 
         self.voc_size = voc_size
@@ -108,7 +108,7 @@ class RNNAtteionLM(nn.Module):
 
         self.rnn = nn.GRU(edim, hdim,
                           dropout=dropout)
-        self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
+        self.toProbs = nn.Sequential(nn.Linear(hdim, nclasses),
                                     nn.LogSoftmax())
         self.attention = Attention(hdim)
 
@@ -136,7 +136,7 @@ class RNNAtteionLM(nn.Module):
 
 class MaxPooling(nn.Module):
 
-    def __init__(self, voc_size, edim, hdim, dropout, padding_idx):
+    def __init__(self, voc_size, edim, hdim, dropout, padding_idx, nclasses):
         super(MaxPooling, self).__init__()
 
         self.voc_size = voc_size
@@ -147,7 +147,7 @@ class MaxPooling(nn.Module):
                                       padding_idx=padding_idx)
         self.linear = nn.Linear(edim, hdim)
         self.dropout = nn.Dropout(p=dropout)
-        self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
+        self.toProbs = nn.Sequential(nn.Linear(hdim, nclasses),
                                      nn.LogSoftmax())
 
         self.with_lm = False
@@ -167,7 +167,7 @@ class MaxPooling(nn.Module):
 
 class AvgPooling(nn.Module):
 
-    def __init__(self, voc_size, edim, hdim, dropout, padding_idx):
+    def __init__(self, voc_size, edim, hdim, dropout, padding_idx, nclasses):
         super(AvgPooling, self).__init__()
 
         self.voc_size = voc_size
@@ -178,7 +178,7 @@ class AvgPooling(nn.Module):
                                       padding_idx=padding_idx)
         self.linear = nn.Linear(edim, hdim)
         self.dropout = nn.Dropout(p=dropout)
-        self.toProbs = nn.Sequential(nn.Linear(hdim, 3),
+        self.toProbs = nn.Sequential(nn.Linear(hdim, nclasses),
                                      nn.LogSoftmax())
 
         self.with_lm = False

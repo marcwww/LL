@@ -32,47 +32,67 @@ if __name__ == '__main__':
     location = opt.gpu if torch.cuda.is_available() and opt.gpu != -1 else 'cpu'
     device = torch.device(location)
 
-    TXT, utrain_iter, uvalid_iter = \
-        preproc.build_iters(ftrain=opt.ftrain,
-                            fvalid=opt.fvalid,
-                            emb_pretrain=opt.pretrain,
-                            skip_header=False,
-                            bsz=opt.bsz,
-                            min_freq=opt.min_freq,
-                            device=opt.gpu)
+    TXT = None
+    utrain_iter = None
+    uvalid_iter = None
+
+    if opt.dataset == 'CHEN':
+        TXT, utrain_iter, uvalid_iter = \
+            preproc.build_iters_CHEN(ftrain=opt.ftrain,
+                                fvalid=opt.fvalid,
+                                emb_pretrain=opt.pretrain,
+                                skip_header=False,
+                                bsz=opt.bsz,
+                                min_freq=opt.min_freq,
+                                device=opt.gpu)
+    if opt.dataset == 'MAN':
+        TXT, utrain_iter, uvalid_iter = \
+            preproc.build_iters_MAN(ftrain=opt.ftrain,
+                                fvalid=opt.fvalid,
+                                emb_pretrain=opt.pretrain,
+                                skip_header=False,
+                                bsz=opt.bsz,
+                                min_freq=opt.min_freq,
+                                device=opt.gpu)
 
     model = None
+    nclasses = len(utrain_iter.dataset.fields['lbl'].vocab.itos)
 
     if opt.net == 'bigru':
         model = nets.BiRNN(voc_size=len(TXT.vocab.itos),
-                             edim=opt.edim,
-                             hdim=opt.hdim,
-                             dropout=opt.dropout,
-                             padding_idx=TXT.vocab.stoi[PAD]).to(device)
+                           edim=opt.edim,
+                           hdim=opt.hdim,
+                           dropout=opt.dropout,
+                           padding_idx=TXT.vocab.stoi[PAD],
+                           nclasses=nclasses).to(device)
     if opt.net == 'max_pooling':
         model = nets.MaxPooling(voc_size=len(TXT.vocab.itos),
-                             edim=opt.edim,
-                             hdim=opt.hdim,
-                             dropout=opt.dropout,
-                             padding_idx=TXT.vocab.stoi[PAD]).to(device)
+                           edim=opt.edim,
+                           hdim=opt.hdim,
+                           dropout=opt.dropout,
+                           padding_idx=TXT.vocab.stoi[PAD],
+                           nclasses=nclasses).to(device)
     if opt.net == 'avg_pooling':
         model = nets.AvgPooling(voc_size=len(TXT.vocab.itos),
-                                edim=opt.edim,
-                                hdim=opt.hdim,
-                                dropout=opt.dropout,
-                                padding_idx=TXT.vocab.stoi[PAD]).to(device)
+                           edim=opt.edim,
+                           hdim=opt.hdim,
+                           dropout=opt.dropout,
+                           padding_idx=TXT.vocab.stoi[PAD],
+                           nclasses=nclasses).to(device)
     if opt.net == 'rnn_atten':
         model = nets.RNNAtteion(voc_size=len(TXT.vocab.itos),
-                                edim=opt.edim,
-                                hdim=opt.hdim,
-                                dropout=opt.dropout,
-                                padding_idx=TXT.vocab.stoi[PAD]).to(device)
+                           edim=opt.edim,
+                           hdim=opt.hdim,
+                           dropout=opt.dropout,
+                           padding_idx=TXT.vocab.stoi[PAD],
+                           nclasses=nclasses).to(device)
     if opt.net == 'rnn_atten_lm':
         model = nets.RNNAtteionLM(voc_size=len(TXT.vocab.itos),
-                                edim=opt.edim,
-                                hdim=opt.hdim,
-                                dropout=opt.dropout,
-                                padding_idx=TXT.vocab.stoi[PAD]).to(device)
+                           edim=opt.edim,
+                           hdim=opt.hdim,
+                           dropout=opt.dropout,
+                           padding_idx=TXT.vocab.stoi[PAD],
+                           nclasses=nclasses).to(device)
 
     utils.init_model(model)
 
@@ -85,7 +105,6 @@ if __name__ == '__main__':
     info = json.loads(open(os.path.join(folder_pwd, INFO), "rt").read())
 
     utils.init_seed(opt.seed)
-
     training.train_ll(model,
                       {'train':utrain_iter, 'valid':uvalid_iter},
                       info,
