@@ -21,7 +21,7 @@ def valid_mnist(model, valid_loader, task_permutation, device):
         for i, (input, lbl) in enumerate(valid_loader):
             input = input.view(-1, MNIST_DIM)
             input = input[:, task_permutation].to(device)
-            lbl = lbl.squeeze(0)
+            lbl = lbl.squeeze(0).to(device)
             # probs: (bsz, 3)
 
             out = model(input)
@@ -61,6 +61,7 @@ def train_domain_mnist(model, dataloaders, opt, domain,
             for i, (input, lbl) in enumerate(train_loader):
                 input = input.view(-1, MNIST_DIM)
                 input = input[:, task_permutations[domain]].to(device)
+                lbl = lbl.to(device)
                 model.train()
 
                 model.zero_grad()
