@@ -6,6 +6,12 @@ import logging
 LOGGER = logging.getLogger(__name__)
 import torch
 import random
+import matplotlib.pyplot as plt
+
+def show_img(img):
+    plt.figure()
+    plt.imshow(img)
+    plt.show()
 
 def get_ms():
     """Returns the current time in miliseconds."""

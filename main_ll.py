@@ -17,7 +17,8 @@ from sklearn.metrics import f1_score, \
     precision_score, \
     recall_score, \
     accuracy_score
-import training
+import training_text, training_cv
+from torchvision import datasets, transforms
 
 if __name__ == '__main__':
     parser = argparse. \
@@ -35,8 +36,10 @@ if __name__ == '__main__':
     TXT = None
     utrain_iter = None
     uvalid_iter = None
+    train_loader = None
+    valid_loader = None
 
-    if opt.dataset == 'CHEN':
+    if opt.dataset == CHEN:
         TXT, utrain_iter, uvalid_iter = \
             preproc.build_iters_CHEN(ftrain=opt.ftrain,
                                 fvalid=opt.fvalid,
@@ -45,7 +48,7 @@ if __name__ == '__main__':
                                 bsz=opt.bsz,
                                 min_freq=opt.min_freq,
                                 device=opt.gpu)
-    if opt.dataset == 'MAN':
+    if opt.dataset == MAN:
         TXT, utrain_iter, uvalid_iter = \
             preproc.build_iters_MAN(ftrain=opt.ftrain,
                                 fvalid=opt.fvalid,
@@ -55,8 +58,27 @@ if __name__ == '__main__':
                                 min_freq=opt.min_freq,
                                 device=opt.gpu)
 
+    if opt.dataset == MNIST:
+        kwargs = {'num_workers': 1, 'pin_memory': True} \
+            if torch.cuda.is_available() and opt.gpu != -1 else {}
+        train_loader = torch.utils.data.DataLoader(
+            datasets.MNIST('../data', train=True, download=True,
+                           transform=transforms.Compose([
+                               transforms.ToTensor(),
+                               # transforms.Resize((-1)),
+                               transforms.Normalize((0.1307,), (0.3081,))
+                           ])),
+            batch_size=opt.bsz, shuffle=True, **kwargs)
+        valid_loader = torch.utils.data.DataLoader(
+            datasets.MNIST('../data', train=False, transform=transforms.Compose([
+                transforms.ToTensor(),
+                # transforms.Resize((-1)),
+                transforms.Normalize((0.1307,), (0.3081,))
+            ])),
+            batch_size=opt.bsz, shuffle=True, **kwargs)
+
     model = None
-    nclasses = len(utrain_iter.dataset.fields['lbl'].vocab.itos)
+    nclasses = opt.nclasses
 
     if opt.net == 'bigru':
         model = nets.BiRNN(voc_size=len(TXT.vocab.itos),
@@ -93,7 +115,10 @@ if __name__ == '__main__':
                            dropout=opt.dropout,
                            padding_idx=TXT.vocab.stoi[PAD],
                            nclasses=nclasses).to(device)
+    if opt.net == 'mlp':
+        model = nets.MLP(opt.idim, nclasses)
 
+    utils.init_seed(opt.seed)
     utils.init_model(model)
 
     optimizer = optim.Adam(params=filter(lambda p: p.requires_grad, model.parameters()),
@@ -101,15 +126,23 @@ if __name__ == '__main__':
 
     criterion = nn.CrossEntropyLoss()
 
-    folder_pwd = os.path.join(DATA, CHEN)
-    info = json.loads(open(os.path.join(folder_pwd, INFO), "rt").read())
+    if opt.dataset in TEXT_DATASETS:
+        folder_pwd = os.path.join(DATA, CHEN)
+        info = json.loads(open(os.path.join(folder_pwd, INFO), "rt").read())
+        training_text.train_ll(model,
+                          {'train':utrain_iter, 'valid':uvalid_iter},
+                          info,
+                          opt,
+                          optimizer)
 
-    utils.init_seed(opt.seed)
-    training.train_ll(model,
-                      {'train':utrain_iter, 'valid':uvalid_iter},
-                      info,
-                      opt,
-                      optimizer)
+    if opt.dataset in CV_DATASETS:
+
+        training_cv.train_ll_mnist(model,
+                                   {'train':train_loader,
+                                     'valid':valid_loader},
+                                   opt,
+                                   optimizer)
+
 
 
 

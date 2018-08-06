@@ -5,6 +5,7 @@ import random
 import json
 import crash_on_ipy
 import codecs
+import numpy as np
 
 def build_iters_CHEN(ftrain, fvalid, emb_pretrain, skip_header, bsz, device, min_freq):
 

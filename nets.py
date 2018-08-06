@@ -204,6 +204,18 @@ class AvgPooling(nn.Module):
 
         return self.toProbs(hiddens)
 
+class MLP(nn.Module):
+
+    def __init__(self, idim, nclasses):
+        super(MLP, self).__init__()
+        self.hdim = idim
+        self.generator = nn.Sequential(
+            nn.Linear(idim, nclasses)
+        )
+        self.softmax = nn.Softmax(dim=0)
+
+    def forward(self, input):
+        return self.generator(input)
 
 
 
