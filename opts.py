@@ -27,7 +27,7 @@ def train_opts(parser):
     group.add_argument('-dataset', type=str, default='mnist')
     group.add_argument('-bsz', type=int, default=4)
     group.add_argument('-min_freq', type=int, default=1)
-    group.add_argument('-nepoch', type=int, default=10)
+    group.add_argument('-nepoch', type=int, default=1)
     group.add_argument('-save_per', type=int, default=5)
     # group.add_argument('-name', type=str, default='rnn_atten_lm')
     group.add_argument('-name', type=str, default='mlp')

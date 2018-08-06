@@ -38,7 +38,7 @@ def valid_mnist(model, valid_loader, task_permutation, device):
 
     return accurracy, precision, recall, f1
 
-def train_domain_mnist(model, dataloaders, opt, domain,
+def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
                        task_permutations, criterion, optim, device):
 
     train_loader = dataloaders['train']
@@ -99,32 +99,33 @@ def train_domain_mnist(model, dataloaders, opt, domain,
                         best_metrics[domain] = (accurracy, precision, recall, f1)
                         best_epoch = epoch
 
-                        # valid the rest
-                        for d in range(opt.ndomains):
-                            if d == domain:
-                                continue
+                        # valid the main domain
 
+                        if domain != main_domain:
                             accurracy, precision, recall, f1 =\
-                                valid_mnist(model, valid_loader, task_permutations[d],device)
+                                valid_mnist(model, valid_loader, task_permutations[main_domain],device)
 
                             print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
-                                  (epoch, d, accurracy, precision, recall, f1))
+                                  (epoch, main_domain, accurracy, precision, recall, f1))
 
-                            best_metrics[d] = (accurracy, precision, recall, f1)
+                            best_metrics[main_domain] = (accurracy, precision, recall, f1)
 
                     print_to.flush()
 
         # logging the best performance on the current domain
-        for d in range(domain+1):
-            accurracy, precision, recall, f1 = best_metrics[d]
-            print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
-                  (best_epoch, d, accurracy, precision, recall, f1), file=print_to)
+        accurracy, precision, recall, f1 = best_metrics[main_domain]
+        print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
+              (best_epoch, main_domain, accurracy, precision, recall, f1), file=print_to)
 
     location = {'cuda:' + str(opt.gpu): 'cuda:' + str(opt.gpu)} if opt.gpu != -1 else 'cpu'
     model_dict = torch.load(best_model, map_location=location)
     model.load_state_dict(model_dict)
 
 def train_ll_mnist(model, dataloaders, opt, optim):
+
+    flog = opt.name + '.log'
+    with open(os.path.join(RES, flog), 'w') as print_to:
+        pass
 
     domains = range(opt.ndomains)
 
@@ -138,5 +139,5 @@ def train_ll_mnist(model, dataloaders, opt, optim):
     for domain in domains:
         criterion = nn.CrossEntropyLoss()
         train_domain_mnist(model, dataloaders,
-                     opt, domain, task_permutations, criterion, optim, device)
+                     opt, domain, 0, task_permutations, criterion, optim, device)
 

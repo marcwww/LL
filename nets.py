@@ -2,6 +2,8 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from macros import *
+import numpy as np
+
 from torch.nn.utils.rnn import pad_packed_sequence,\
     pack_padded_sequence
 
@@ -216,6 +218,41 @@ class MLP(nn.Module):
 
     def forward(self, input):
         return self.generator(input)
+
+class BaseMemory(nn.Module):
+
+    def __init__(self, capacity, edim):
+        super(BaseMemory, self).__init__()
+        self.capacity = capacity
+        self.edim = edim
+        self.mems = nn.Parameter(torch.Tensor(capacity, edim),
+                                 requires_grad=False)
+        self.ptr = 0
+
+    def fetch(self, inputs):
+        raise NotImplementedError
+
+    def add(self, inputs):
+        raise NotImplementedError
+
+class RandomMemory(BaseMemory):
+
+    def fetch(self, inputs):
+        # input: (bsz, hdim)
+        bsz = inputs.shape[0]
+        res = []
+        for i in np.random.choice(self.capacity, bsz):
+            res.append(self.mems[i].unsqueeze(0))
+
+        return torch.cat(res, dim=0)
+
+    def add(self, inputs):
+        for input in inputs:
+            self.mems[self.ptr] = input
+            self.ptr %= self.capacity
+
+
+
 
 
 

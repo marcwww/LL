@@ -10,7 +10,7 @@ import sys
 import demjson
 import crash_on_ipy
 
-flog = 'rnn_atten.log'
+flog = 'mlp.log'
 with open(os.path.join(RES, flog), 'r') as f:
     lines = f.readlines()
     maps = []
@@ -37,8 +37,8 @@ with open(os.path.join(RES, flog), 'r') as f:
 
     print(domain_f1s)
 
-# domain = [1]
-domain = range(20)
+domain = [0]
+# domain = range(20)
 
 for d, f1s in domain_f1s.items():
     if d in domain:
