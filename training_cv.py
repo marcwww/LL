@@ -12,7 +12,7 @@ from macros import *
 from torch import nn
 import numpy as np
 
-def valid_mnist(model, valid_loader, task_permutation):
+def valid_mnist(model, valid_loader, task_permutation, device):
     model.eval()
     pred_lst = []
     true_lst = []
@@ -20,7 +20,7 @@ def valid_mnist(model, valid_loader, task_permutation):
     with torch.no_grad():
         for i, (input, lbl) in enumerate(valid_loader):
             input = input.view(-1, MNIST_DIM)
-            input = input[:, task_permutation]
+            input = input[:, task_permutation].to(device)
             lbl = lbl.squeeze(0)
             # probs: (bsz, 3)
 
@@ -39,7 +39,7 @@ def valid_mnist(model, valid_loader, task_permutation):
     return accurracy, precision, recall, f1
 
 def train_domain_mnist(model, dataloaders, opt, domain,
-                       task_permutations, criterion, optim):
+                       task_permutations, criterion, optim, device):
 
     train_loader = dataloaders['train']
     valid_loader = dataloaders['valid']
@@ -60,7 +60,7 @@ def train_domain_mnist(model, dataloaders, opt, domain,
         for epoch in range(opt.nepoch):
             for i, (input, lbl) in enumerate(train_loader):
                 input = input.view(-1, MNIST_DIM)
-                input = input[:, task_permutations[domain]]
+                input = input[:, task_permutations[domain]].to(device)
                 model.train()
 
                 model.zero_grad()
@@ -76,7 +76,7 @@ def train_domain_mnist(model, dataloaders, opt, domain,
                 if (i + 1) % int(1 / 4 * len(train_loader)) == 0:
                     # valid
                     accurracy, precision, recall, f1 = \
-                        valid_mnist(model, valid_loader, task_permutations[domain])
+                        valid_mnist(model, valid_loader, task_permutations[domain],device)
                     performance = {'accuracy':accurracy,
                                    'precision':precision,
                                    'recall':recall,
@@ -104,7 +104,7 @@ def train_domain_mnist(model, dataloaders, opt, domain,
                                 continue
 
                             accurracy, precision, recall, f1 =\
-                                valid_mnist(model, valid_loader, task_permutations[d])
+                                valid_mnist(model, valid_loader, task_permutations[d],device)
 
                             print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
                                   (epoch, d, accurracy, precision, recall, f1))
@@ -137,5 +137,5 @@ def train_ll_mnist(model, dataloaders, opt, optim):
     for domain in domains:
         criterion = nn.CrossEntropyLoss()
         train_domain_mnist(model, dataloaders,
-                     opt, domain, task_permutations, criterion, optim)
+                     opt, domain, task_permutations, criterion, optim, device)
 
