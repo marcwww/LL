@@ -116,7 +116,7 @@ if __name__ == '__main__':
                            padding_idx=TXT.vocab.stoi[PAD],
                            nclasses=nclasses).to(device)
     if opt.net == 'mlp':
-        model = nets.MLP(opt.idim, nclasses)
+        model = nets.MLP(opt.idim, nclasses).to(device)
 
     utils.init_seed(opt.seed)
     utils.init_model(model)
