@@ -65,7 +65,7 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
                 model.train()
 
                 model.zero_grad()
-                loss = model.adapt(input, lbl)
+                loss = model.adapt(input, lbl, domain)
                 loss.backward()
 
                 # clip_grad_norm_(model.parameters(), 5)
