@@ -124,13 +124,14 @@ if __name__ == '__main__':
         model = nets.RAMMLP(idim=opt.idim,nclasses=nclasses,
                             capacity=opt.capacity,
                             criterion = nn.CrossEntropyLoss(),
-                            add_per=opt.add_per)
+                            add_per=opt.add_per).to(device)
 
     if opt.net == 'mbpamlp':
         model = nets.MbPAMLP(idim=opt.idim,nclasses=nclasses,
                             capacity=opt.capacity,
                             criterion = nn.CrossEntropyLoss(),
-                            add_per=opt.add_per)
+                            add_per=opt.add_per,
+                            device=device).to(device)
 
     utils.init_seed(opt.seed)
     utils.init_model(model)

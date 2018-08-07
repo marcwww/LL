@@ -321,7 +321,7 @@ class MbPAMemory(BaseMemory):
 class MbPAMLP(MLP):
 
     def __init__(self, idim, nclasses, capacity,
-                 criterion, add_per):
+                 criterion, add_per, device):
         super(MbPAMLP, self).__init__(idim, nclasses)
         self.idim = idim
         self.nclasses = nclasses
@@ -336,6 +336,7 @@ class MbPAMLP(MLP):
         self.lambda_mbpa = 0.1
         self.K = 256
         self.alpha_m = 1
+        self.device = device
 
     def adapt(self, inputs, lbls):
         if self.nsteps % self.add_per == 0:
@@ -365,7 +366,7 @@ class MbPAMLP(MLP):
             if param.requires_grad:
                 params[name].data.copy_(param.data)
 
-        return new_model
+        return new_model.to(self.device)
 
     def _dis_parameters(self, model_base, model):
         res = 0
