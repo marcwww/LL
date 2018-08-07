@@ -336,9 +336,6 @@ class MbPAMLP(MLP):
         self.lambda_mbpa = 0.1
         self.K = 256
         self.alpha_m = 1
-        self.optimizer = optim.SGD(filter(lambda p: p.requires_grad,
-                                          super(MbPAMLP, self).parameters()),
-                                   lr=self.lr)
 
     def adapt(self, inputs, lbls):
         if self.nsteps % self.add_per == 0:
@@ -370,12 +367,14 @@ class MbPAMLP(MLP):
 
         return new_model
 
-    def _dis_parameters(self, params_origin):
+    def _dis_parameters(self, model_base, model):
         res = 0
+        params_base = dict(model_base.named_parameters())
+        params = model.named_parameters()
 
-        for name, param in super(MbPAMLP, self).named_parameters():
+        for name, param in params:
             if param.requires_grad:
-                res += torch.norm(param - params_origin[name], p=2)
+                res += torch.norm(param - params_base[name].data, p=2)
 
         res = -1*torch.pow(res, exponent=2)/(2*self.alpha_m)
         return res
@@ -387,8 +386,11 @@ class MbPAMLP(MLP):
 
     def forward(self, input):
 
+        torch.set_grad_enabled(True)
+
         tester = self._new_mlp()
-        params_origin = self._copy_parameters()
+        optimizer = optim.SGD(tester.parameters(),
+                                   lr=self.lr)
         bsz, _ = input.shape
 
         for _ in range(self.update_steps):
@@ -408,7 +410,7 @@ class MbPAMLP(MLP):
             top_vals /= top_vals.sum(dim=0)
 
             mem = mem[idx]
-            posterior = torch.log(super(MbPAMLP, self).forward(mem))
+            posterior = torch.log(tester.forward(mem))
             # posterior = torch.log(self.generator(mem[idx]))
 
             nclasses = posterior.shape[-1]
@@ -418,15 +420,15 @@ class MbPAMLP(MLP):
             posterior = posterior.view(-1, bsz)
 
             context_loss = (top_vals * posterior).sum(dim=0)
-            paramDis_loss = self._dis_parameters(params_origin)
+            paramDis_loss = self._dis_parameters(model_base=self,
+                                                 model=tester)
 
             losses = paramDis_loss + context_loss
             loss = losses.sum() / bsz
             loss.backward()
-            self.optimizer.step()
+            optimizer.step()
 
         out = self.generator(input)
-        self._restore_paramaters(params_origin)
 
         return out
 
