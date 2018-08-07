@@ -417,7 +417,8 @@ class MbPAMLP(MLP):
             nclasses = posterior.shape[-1]
             lbl = lbl[idx]
             posterior = utils.select_1d(posterior.view(-1, nclasses),
-                                        lbl.view(-1))
+                                        lbl.view(-1),
+                                        self.device)
             posterior = posterior.view(-1, bsz)
 
             context_loss = (top_vals * posterior).sum(dim=0)
