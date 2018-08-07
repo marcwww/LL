@@ -82,3 +82,12 @@ def progress_bar(percent, last_loss, epoch):
         epoch,
         last_loss),
         end='')
+
+def select_1d(data, index):
+    # data: (N, M)
+    # index: (N)
+    N, M = data.shape
+    idx = index + torch.LongTensor(range(N)) * M
+    # res: (N)
+    res = data.view(-1)[idx.view(-1)]
+    return res

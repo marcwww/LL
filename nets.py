@@ -3,9 +3,10 @@ from torch import nn
 import torch.nn.functional as F
 from macros import *
 import numpy as np
-
+from torch import optim
 from torch.nn.utils.rnn import pad_packed_sequence,\
     pack_padded_sequence
+import utils
 
 class BiRNN(nn.Module):
 
@@ -214,42 +215,231 @@ class MLP(nn.Module):
         self.generator = nn.Sequential(
             nn.Linear(idim, nclasses)
         )
-        self.softmax = nn.Softmax(dim=0)
 
     def forward(self, input):
-        return self.generator(input)
+        res = self.generator(input)
+        return res
 
 class BaseMemory(nn.Module):
 
-    def __init__(self, capacity, edim):
+    def __init__(self, capacity, xdim):
         super(BaseMemory, self).__init__()
         self.capacity = capacity
-        self.edim = edim
-        self.mems = nn.Parameter(torch.Tensor(capacity, edim),
+        self.xdim = xdim
+        self.mems_x = nn.Parameter(torch.Tensor(capacity, xdim),
                                  requires_grad=False)
-        self.ptr = 0
+        self.mems_y = nn.Parameter(torch.LongTensor(capacity),
+                                   requires_grad=False)
 
-    def fetch(self, inputs):
+    def fetch(self, *input):
         raise NotImplementedError
 
-    def add(self, inputs):
+    def add(self, *input):
         raise NotImplementedError
 
 class RandomMemory(BaseMemory):
 
+    def __init__(self, capacity, xdim):
+        super(RandomMemory, self).__init__(capacity, xdim)
+        self.ptr = 0
+        self.is_full = False
+
     def fetch(self, inputs):
         # input: (bsz, hdim)
         bsz = inputs.shape[0]
-        res = []
-        for i in np.random.choice(self.capacity, bsz):
-            res.append(self.mems[i].unsqueeze(0))
+        res_x = []
+        res_y = []
+        length = self.capacity if self.is_full else self.ptr
+        if length == 0:
+            return None, None
 
-        return torch.cat(res, dim=0)
+        for i in np.random.choice(length, bsz):
+            res_x.append(self.mems_x[i].unsqueeze(0))
+            res_y.append(self.mems_y[i].unsqueeze(0))
 
-    def add(self, inputs):
-        for input in inputs:
-            self.mems[self.ptr] = input
+        return torch.cat(res_x, dim=0), \
+               torch.cat(res_y, dim=0)
+
+    def add(self, inputs, lbls):
+        for input, lbl in zip(inputs, lbls):
+            self.mems_x[self.ptr] = input
+            self.mems_y[self.ptr] = lbl
+            self.ptr += 1
+            if self.ptr >= self.capacity:
+                self.is_full = True
+
             self.ptr %= self.capacity
+
+# Random memory MLP
+class RAMMLP(MLP):
+
+    def __init__(self, idim, nclasses, capacity,
+                 criterion, add_per):
+
+        super(RAMMLP, self).__init__(idim, nclasses)
+        self.mem = RandomMemory(capacity, idim)
+        self.nsteps = 0
+        self.criterion = criterion
+        self.add_per = add_per
+
+    def adapt(self, inputs, lbls):
+        context_x, context_y = self.mem.fetch(inputs)
+        if self.nsteps % self.add_per == 0:
+            self.mem.add(inputs, lbls)
+        if context_x is not None and\
+                context_x is not None:
+            out = self.forward(torch.cat([inputs, context_x], dim=0))
+            lbl = torch.cat([lbls, context_y], dim=0)
+        else:
+            out = self.forward(inputs)
+            lbl = lbls
+        loss = self.criterion(out, lbl.squeeze(0))
+        self.nsteps +=1
+        return loss
+
+
+class MbPAMemory(BaseMemory):
+
+    def __init__(self, capacity, xdim):
+        super(MbPAMemory, self).__init__(capacity, xdim)
+        self.ptr = 0
+        self.is_full = False
+
+    def fetch(self, inputs):
+        pass
+
+    def add(self, inputs, lbls):
+        for input, lbl in zip(inputs, lbls):
+            self.mems_x[self.ptr] = input
+            self.mems_y[self.ptr] = lbl
+            self.ptr += 1
+            if self.ptr >= self.capacity:
+                self.is_full = True
+
+            self.ptr %= self.capacity
+
+class MbPAMLP(MLP):
+
+    def __init__(self, idim, nclasses, capacity,
+                 criterion, add_per):
+        super(MbPAMLP, self).__init__(idim, nclasses)
+        self.idim = idim
+        self.nclasses = nclasses
+        self.mem = RandomMemory(capacity, idim)
+        self.criterion = criterion
+        self.nsteps = 0
+        self.add_per = add_per
+        self.epsilon = 1e-4
+        self.update_steps = 1
+        self.lr = 0.15
+        self.lambda_cache = 0.15
+        self.lambda_mbpa = 0.1
+        self.K = 256
+        self.alpha_m = 1
+        self.optimizer = optim.SGD(filter(lambda p: p.requires_grad,
+                                          super(MbPAMLP, self).parameters()),
+                                   lr=self.lr)
+
+    def adapt(self, inputs, lbls):
+        if self.nsteps % self.add_per == 0:
+            self.mem.add(inputs, lbls)
+        if self.nsteps % self.add_per == 0:
+            self.mem.add(inputs, lbls)
+
+        out = self.generator(inputs)
+        loss = self.criterion(out, lbls.squeeze(0))
+        self.nsteps += 1
+
+        return loss
+
+    def _copy_parameters(self):
+        res = {}
+        params = super(MbPAMLP, self).named_parameters()
+        for name, param in params:
+            if param.requires_grad:
+                res[name] = param.data
+
+        return res
+
+    def _new_mlp(self):
+        new_model = MLP(self.idim, self.nclasses)
+        params = dict(new_model.named_parameters())
+        for name, param in self.named_parameters():
+            if param.requires_grad:
+                params[name].data.copy_(param.data)
+
+        return new_model
+
+    def _dis_parameters(self, params_origin):
+        res = 0
+
+        for name, param in super(MbPAMLP, self).named_parameters():
+            if param.requires_grad:
+                res += torch.norm(param - params_origin[name], p=2)
+
+        res = -1*torch.pow(res, exponent=2)/(2*self.alpha_m)
+        return res
+
+    def _restore_paramaters(self, params_origin):
+        cur_params = dict(self.named_parameters())
+        for name, param in params_origin.items():
+            cur_params[name].data.copy_(param.data)
+
+    def forward(self, input):
+
+        tester = self._new_mlp()
+        params_origin = self._copy_parameters()
+        bsz, _ = input.shape
+
+        for _ in range(self.update_steps):
+            mem = self.mem.mems_x if self.mem.is_full \
+                else self.mem.mems_x[:self.mem.ptr+1]
+            lbl = self.mem.mems_y if self.mem.is_full \
+                else self.mem.mems_y[:self.mem.ptr+1]
+
+            mem_expanded = mem.unsqueeze(1).\
+                expand(mem.shape[0], bsz, mem.shape[1])
+            dis_sq = torch.pow(torch.norm(mem_expanded - input, p=2,
+                                          dim=-1),
+                               exponent=2)
+            kern_val = 1/(self.epsilon + dis_sq)
+
+            top_vals, idx = torch.topk(kern_val, k=self.K, dim=0)
+            top_vals /= top_vals.sum(dim=0)
+
+            mem = mem[idx]
+            posterior = torch.log(super(MbPAMLP, self).forward(mem))
+            # posterior = torch.log(self.generator(mem[idx]))
+
+            nclasses = posterior.shape[-1]
+            lbl = lbl[idx]
+            posterior = utils.select_1d(posterior.view(-1, nclasses),
+                                        lbl.view(-1))
+            posterior = posterior.view(-1, bsz)
+
+            context_loss = (top_vals * posterior).sum(dim=0)
+            paramDis_loss = self._dis_parameters(params_origin)
+
+            losses = paramDis_loss + context_loss
+            loss = losses.sum() / bsz
+            loss.backward()
+            self.optimizer.step()
+
+        out = self.generator(input)
+        self._restore_paramaters(params_origin)
+
+        return out
+
+
+
+
+
+
+
+
+
+
+
 
 
 
