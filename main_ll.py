@@ -65,7 +65,6 @@ if __name__ == '__main__':
             datasets.MNIST('../data', train=True, download=True,
                            transform=transforms.Compose([
                                transforms.ToTensor(),
-                               # transforms.Resize((-1)),
                                transforms.Normalize((0.1307,), (0.3081,))
                            ])),
             batch_size=opt.bsz, shuffle=True,)
@@ -73,10 +72,9 @@ if __name__ == '__main__':
         valid_loader = torch.utils.data.DataLoader(
             datasets.MNIST('../data', train=False, transform=transforms.Compose([
                 transforms.ToTensor(),
-                # transforms.Resize((-1)),
                 transforms.Normalize((0.1307,), (0.3081,))
             ])),
-            batch_size=opt.bsz, shuffle=True, )
+            batch_size=opt.bsz, shuffle=True,)
             # **kwargs)
 
     model = None

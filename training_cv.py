@@ -59,6 +59,9 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
         best_epoch = 0
         for epoch in range(opt.nepoch):
             for i, (input, lbl) in enumerate(train_loader):
+
+                length = len(train_loader)
+
                 input = input.view(-1, MNIST_DIM)
                 input = input[:, task_permutations[domain]].to(device)
                 lbl = lbl.to(device)
