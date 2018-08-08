@@ -378,7 +378,7 @@ class MbPAMLP(MLP):
             if param.requires_grad:
                 res += torch.norm(param - params_base[name].data, p=2)
 
-        res = -1 * torch.pow(res, exponent=2)/(2*self.alpha_m)
+        res = torch.pow(res, exponent=2)/(2*self.alpha_m)
         return res
 
     def _restore_paramaters(self, params_origin):
@@ -413,18 +413,13 @@ class MbPAMLP(MLP):
             top_vals /= top_vals.sum(dim=0)
 
             mem = mem[idx]
-            posterior = F.log_softmax(tester.forward(mem),
-                                      dim=-1)
-            # posterior = torch.log(self.generator(mem[idx]))
-
-            nclasses = posterior.shape[-1]
             lbl = lbl[idx]
-            posterior = utils.select_1d(posterior.view(-1, nclasses),
-                                        lbl.view(-1),
-                                        self.device)
+            out = tester.forward(mem)
+            out = out.view(-1, out.shape[-1])
+            lbl = lbl.view(-1)
+            posterior = F.cross_entropy(out, lbl.squeeze(0), reduce=False)
             posterior = posterior.view(-1, bsz)
-
-            context_loss = -1 * (top_vals * posterior).sum(dim=0)
+            context_loss = (top_vals * posterior).sum(dim=0)
             paramDis_loss = self._dis_parameters(model_base=self,
                                                  model=tester)
 
