@@ -76,7 +76,7 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
 
                 utils.progress_bar(i / len(train_loader), loss.item(), epoch)
 
-                if (i + 1) % int(1 / 4 * len(train_loader)) == 0:
+                if (i + 1) % int(opt.test_per_ratio * len(train_loader)) == 0:
                     # valid
                     accurracy, precision, recall, f1 = \
                         valid_mnist(model, valid_loader, task_permutations[domain],device)

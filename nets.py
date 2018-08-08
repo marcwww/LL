@@ -413,7 +413,8 @@ class MbPAMLP(MLP):
             top_vals /= top_vals.sum(dim=0)
 
             mem = mem[idx]
-            posterior = torch.log(tester.forward(mem))
+            posterior = F.log_softmax(tester.forward(mem),
+                                      dim=-1)
             # posterior = torch.log(self.generator(mem[idx]))
 
             nclasses = posterior.shape[-1]
