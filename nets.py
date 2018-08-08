@@ -414,7 +414,7 @@ class MbPAMLP(MLP):
 
             mem = mem[idx]
             lbl = lbl[idx]
-            out = tester.forward(mem)
+            out = tester(mem)
             out = out.view(-1, out.shape[-1])
             lbl = lbl.view(-1)
             posterior = F.cross_entropy(out, lbl.squeeze(0), reduce=False)
@@ -428,7 +428,7 @@ class MbPAMLP(MLP):
             loss.backward()
             optimizer.step()
 
-        out = self.generator(input)
+        out = tester(input)
 
         return out
 
