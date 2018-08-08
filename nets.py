@@ -408,7 +408,8 @@ class MbPAMLP(MLP):
                                exponent=2)
             kern_val = 1/(self.epsilon + dis_sq)
 
-            top_vals, idx = torch.topk(kern_val, k=self.K, dim=0)
+            top_vals, idx = torch.topk(kern_val,
+                                       k=min(self.K, kern_val.shape[0]), dim=0)
             top_vals /= top_vals.sum(dim=0)
 
             mem = mem[idx]
