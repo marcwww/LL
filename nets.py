@@ -336,7 +336,7 @@ class MbPAMLP(MLP):
         self.add_per = add_per
         self.epsilon = 1e-4
         self.update_steps = 5
-        self.lr = 1e-3
+        self.lr = 1e-2
         self.lambda_cache = 0.15
         self.lambda_mbpa = 0.1
         self.K = 128
