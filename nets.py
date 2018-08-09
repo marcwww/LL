@@ -349,9 +349,9 @@ class MbPAMLP(MLP):
         self.update_steps = 10
         self.lr = 1e-1
         self.lambda_cache = 0.15
-        self.lambda_mbpa = 1
+        self.lambda_mbpa = 0.1
         self.K = 128
-        self.alpha_m = 10
+        self.alpha_m = 1
         self.device = device
 
     def adapt(self, inputs, lbls):
