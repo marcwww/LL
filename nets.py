@@ -449,7 +449,7 @@ class MbPAMLP(MLP):
                         lbl = lbl.squeeze(0).to(device)
                         # probs: (bsz, 3)
 
-                        out = tester(input, valid_loader, task_permutation, deep_test, device)
+                        out = tester(input)
 
                         pred = out.max(dim=1)[1].cpu().numpy()
                         lbl = lbl.cpu().numpy()
