@@ -402,27 +402,29 @@ class MbPAMLP(MLP):
                                    lr=self.lr)
         bsz, _ = input.shape
 
+
+        mem = self.mem.mems_x if self.mem.is_full \
+            else self.mem.mems_x[:self.mem.ptr+1]
+        lbl = self.mem.mems_y if self.mem.is_full \
+            else self.mem.mems_y[:self.mem.ptr+1]
+
+        mem_expanded = mem.unsqueeze(1).\
+            expand(mem.shape[0], bsz, mem.shape[1])
+        dis_sq = torch.pow(torch.norm(mem_expanded - input, p=2,
+                                      dim=-1),
+                           exponent=2)
+        kern_val = 1/(self.epsilon + dis_sq)
+
+        top_vals, idx = torch.topk(kern_val,
+                                   k=min(self.K, kern_val.shape[0]), dim=0)
+        top_vals /= top_vals.sum(dim=0)
+
+        mem = mem[idx]
+        lbl = lbl[idx]
+
         for step_idx in range(100 if deep_test else self.update_steps):
             tester.zero_grad()
             tester.train()
-            mem = self.mem.mems_x if self.mem.is_full \
-                else self.mem.mems_x[:self.mem.ptr+1]
-            lbl = self.mem.mems_y if self.mem.is_full \
-                else self.mem.mems_y[:self.mem.ptr+1]
-
-            mem_expanded = mem.unsqueeze(1).\
-                expand(mem.shape[0], bsz, mem.shape[1])
-            dis_sq = torch.pow(torch.norm(mem_expanded - input, p=2,
-                                          dim=-1),
-                               exponent=2)
-            kern_val = 1/(self.epsilon + dis_sq)
-
-            top_vals, idx = torch.topk(kern_val,
-                                       k=min(self.K, kern_val.shape[0]), dim=0)
-            top_vals /= top_vals.sum(dim=0)
-
-            mem = mem[idx]
-            lbl = lbl[idx]
             out = tester(mem)
             out = out.view(-1, out.shape[-1])
             lbl = lbl.view(-1)
@@ -464,6 +466,9 @@ class MbPAMLP(MLP):
                 precision = precision_score(true_lst, pred_lst, average='macro')
                 recall = recall_score(true_lst, pred_lst, average='macro')
                 f1 = f1_score(true_lst, pred_lst, average='macro')
+
+                if step_idx >= 15:
+                    optimizer.param_groups[0]['lr'] = self.lr/10
 
                 print('deep_test %d/%d:' % (step_idx,self.update_steps),
                       context_loss.item(),
