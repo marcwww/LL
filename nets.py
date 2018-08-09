@@ -335,7 +335,7 @@ class MbPAMLP(MLP):
         self.nsteps = 0
         self.add_per = add_per
         self.epsilon = 1e-4
-        self.update_steps = 100
+        self.update_steps = 5
         self.lr = 1e-3
         self.lambda_cache = 0.15
         self.lambda_mbpa = 0.1
@@ -402,7 +402,7 @@ class MbPAMLP(MLP):
                                    lr=self.lr)
         bsz, _ = input.shape
 
-        for step_idx in range(self.update_steps):
+        for step_idx in range(100 if deep_test else self.update_steps):
             tester.zero_grad()
             tester.train()
             mem = self.mem.mems_x if self.mem.is_full \
