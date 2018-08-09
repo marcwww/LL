@@ -443,18 +443,18 @@ class MbPAMLP(MLP):
                 true_lst = []
 
                 with torch.no_grad():
-                    for i, (input, lbl) in enumerate(valid_loader):
-                        input = input.view(-1, MNIST_DIM)
-                        input = input[:, task_permutation].to(device)
-                        lbl = lbl.squeeze(0).to(device)
+                    for i, (input_test, lbl_test) in enumerate(valid_loader):
+                        input_test = input_test.view(-1, MNIST_DIM)
+                        input_test = input_test[:, task_permutation].to(device)
+                        lbl_test = lbl_test.squeeze(0).to(device)
                         # probs: (bsz, 3)
 
-                        out = tester(input)
+                        out = tester(input_test)
 
                         pred = out.max(dim=1)[1].cpu().numpy()
-                        lbl = lbl.cpu().numpy()
+                        lbl_test = lbl_test.cpu().numpy()
                         pred_lst.extend(pred)
-                        true_lst.extend(lbl)
+                        true_lst.extend(lbl_test)
 
                 accurracy = accuracy_score(true_lst, pred_lst)
                 precision = precision_score(true_lst, pred_lst, average='macro')
