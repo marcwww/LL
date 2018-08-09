@@ -12,7 +12,7 @@ from macros import *
 from torch import nn
 import numpy as np
 
-def valid_mnist(model, valid_loader, task_permutation, device):
+def valid_mnist(model, valid_loader, task_permutation, deep_test, device):
     model.eval()
     pred_lst = []
     true_lst = []
@@ -24,7 +24,7 @@ def valid_mnist(model, valid_loader, task_permutation, device):
             lbl = lbl.squeeze(0).to(device)
             # probs: (bsz, 3)
 
-            out = model(input)
+            out = model(input, valid_loader, task_permutation, deep_test, device)
 
             pred = out.max(dim=1)[1].cpu().numpy()
             lbl = lbl.cpu().numpy()
@@ -79,7 +79,7 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
                 if (i + 1) % int(opt.test_per_ratio * len(train_loader)) == 0:
                     # valid
                     accurracy, precision, recall, f1 = \
-                        valid_mnist(model, valid_loader, task_permutations[domain],device)
+                        valid_mnist(model, valid_loader, task_permutations[domain], False, device)
                     performance = {'accuracy':accurracy,
                                    'precision':precision,
                                    'recall':recall,
@@ -105,7 +105,7 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
 
                         if domain != main_domain:
                             accurracy, precision, recall, f1 =\
-                                valid_mnist(model, valid_loader, task_permutations[main_domain],device)
+                                valid_mnist(model, valid_loader, task_permutations[main_domain], True, device)
 
                             print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
                                   (epoch, main_domain, accurracy, precision, recall, f1))

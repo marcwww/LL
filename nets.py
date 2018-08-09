@@ -7,6 +7,11 @@ from torch import optim
 from torch.nn.utils.rnn import pad_packed_sequence,\
     pack_padded_sequence
 import utils
+import training_cv
+from sklearn.metrics import f1_score, \
+    precision_score, \
+    recall_score, \
+    accuracy_score
 
 class BiRNN(nn.Module):
 
@@ -386,7 +391,7 @@ class MbPAMLP(MLP):
         for name, param in params_origin.items():
             cur_params[name].data.copy_(param.data)
 
-    def forward(self, input):
+    def forward(self, input, valid_loader, task_permutation, deep_test, device):
 
         torch.set_grad_enabled(True)
 
@@ -395,7 +400,9 @@ class MbPAMLP(MLP):
                                    lr=self.lr)
         bsz, _ = input.shape
 
-        for _ in range(self.update_steps):
+        for i in range(self.update_steps):
+            tester.zero_grad()
+            tester.train()
             mem = self.mem.mems_x if self.mem.is_full \
                 else self.mem.mems_x[:self.mem.ptr+1]
             lbl = self.mem.mems_y if self.mem.is_full \
@@ -429,6 +436,32 @@ class MbPAMLP(MLP):
             # loss = losses.sum() / bsz
             loss.backward()
             optimizer.step()
+
+            if deep_test:
+                tester.eval()
+                pred_lst = []
+                true_lst = []
+
+                with torch.no_grad():
+                    for i, (input, lbl) in enumerate(valid_loader):
+                        input = input.view(-1, MNIST_DIM)
+                        input = input[:, task_permutation].to(device)
+                        lbl = lbl.squeeze(0).to(device)
+                        # probs: (bsz, 3)
+
+                        out = tester(input, valid_loader, task_permutation, deep_test, device)
+
+                        pred = out.max(dim=1)[1].cpu().numpy()
+                        lbl = lbl.cpu().numpy()
+                        pred_lst.extend(pred)
+                        true_lst.extend(lbl)
+
+                accurracy = accuracy_score(true_lst, pred_lst)
+                precision = precision_score(true_lst, pred_lst, average='macro')
+                recall = recall_score(true_lst, pred_lst, average='macro')
+                f1 = f1_score(true_lst, pred_lst, average='macro')
+
+                print('deep_test %d:' % i, loss.item(), f1)
 
         out = tester(input)
 
