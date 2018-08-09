@@ -104,8 +104,9 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
                         # valid the main domain
 
                         if domain != main_domain:
+                            deep_test = (domain == 2)
                             accurracy, precision, recall, f1 =\
-                                valid_mnist(model, valid_loader, task_permutations[main_domain], True, device)
+                                valid_mnist(model, valid_loader, task_permutations[main_domain], deep_test, device)
 
                             print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
                                   (epoch, main_domain, accurracy, precision, recall, f1))
