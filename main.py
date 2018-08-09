@@ -17,7 +17,7 @@ from sklearn.metrics import f1_score, \
     precision_score, \
     recall_score, \
     accuracy_score
-import training
+import training_cv, training_text
 
 if __name__ == '__main__':
     parser = argparse. \
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     folder_pwd = os.path.join(DATA, CHEN)
     info = json.loads(open(os.path.join(folder_pwd, INFO), "rt").read())
 
-    training.train(model,
+    training_text.train(model,
                    {'train':train_iter, 'valid':valid_iter},
                     opt,
                     0,

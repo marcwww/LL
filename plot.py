@@ -11,46 +11,56 @@ import demjson
 import crash_on_ipy
 
 # flog = 'rammlp_add-per-100.log'
-flog = 'mbpamlp.log'
-with open(os.path.join(RES, flog), 'r') as f:
-    lines = f.readlines()
-    maps = []
-    domain_pos = []
 
-    for i, line in enumerate(lines):
-        one_map = demjson.decode(line)
-        if len(one_map) == 1:
-            domain_pos.append(i)
-        else:
-            maps.append(one_map)
+def draw(flog, name):
+    with open(os.path.join(RES, flog), 'r') as f:
+        lines = f.readlines()
+        maps = []
+        domain_pos = []
 
-    domain_f1s = {}
-    for i in range(len(domain_pos) - 1):
-        domain_f1s[i] = []
-        begin = domain_pos[i]
-        end = domain_pos[i+1]
-        records = maps[begin:end]
-        for record in records:
-            dom, f1 = record['Domain'], record['Metrics'][-1]
-            if dom not in domain_f1s.keys():
-                domain_f1s[dom] = []
-            domain_f1s[dom].append(f1)
+        for i, line in enumerate(lines):
+            one_map = demjson.decode(line)
+            if len(one_map) == 1:
+                domain_pos.append(i)
+            else:
+                maps.append(one_map)
 
-    print(domain_f1s)
+        domain_f1s = {}
+        for i in range(len(domain_pos) - 1):
+            domain_f1s[i] = []
+            begin = domain_pos[i]
+            end = domain_pos[i+1]
+            records = maps[begin:end]
+            for record in records:
+                dom, f1 = record['Domain'], record['Metrics'][-1]
+                if dom not in domain_f1s.keys():
+                    domain_f1s[dom] = []
+                domain_f1s[dom].append(f1)
 
-domain = [0]
-# domain = range(20)
+        print(domain_f1s)
 
-for d, f1s in domain_f1s.items():
-    if d in domain:
-        x = np.array(range(0, len(f1s), 1)) + d * 1
-        y = [f1s[i] for i in range(0, len(f1s), 1)]
-        plt.plot(x, y, label='d{}'.format(d))
+    domain = [0]
+    # domain = range(20)
 
-plt.yticks(np.arange(0, 1.1, 0.1))
-plt.xticks(np.arange(0, 20, 1))
-plt.legend(loc=0)
+    for d, f1s in domain_f1s.items():
+        if d in domain:
+            x = np.array(range(0, len(f1s), 1)) + d * 1
+            y = [f1s[i] for i in range(0, len(f1s), 1)]
+            plt.plot(x, y, label='{}'.format(name))
+
+    plt.yticks(np.arange(0, 1.1, 0.1))
+    plt.xticks(np.arange(0, 20, 1))
+    plt.legend(loc=0)
+
+
+flog1 = 'rammlp_add-per-100.log'
+flog2 = 'rammlp_add-per-1000.log'
+flog3 = 'mbpamlp.log'
+draw(flog1, flog1)
+draw(flog2, flog2)
+draw(flog3, flog3)
 plt.show()
+
 
 #
 # loss = history[3]['loss']
