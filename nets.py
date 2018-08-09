@@ -217,7 +217,7 @@ class MLP(nn.Module):
     def __init__(self, idim, nclasses):
         super(MLP, self).__init__()
         self.hdim = idim
-        self.generator = nn.Sequential([nn.Linear(idim, nclasses)])
+        self.generator = nn.Sequential(nn.Linear(idim, nclasses))
 
     def forward(self, input):
         res = self.generator(input)
