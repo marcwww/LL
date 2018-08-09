@@ -336,7 +336,7 @@ class MbPAMLP(MLP):
         self.add_per = add_per
         self.epsilon = 1e-4
         self.update_steps = 10
-        self.lr = 1e-3
+        self.lr = 1e-2
         self.lambda_cache = 0.15
         self.lambda_mbpa = 0.1
         self.K = 256
@@ -443,7 +443,7 @@ class MbPAMLP(MLP):
                 true_lst = []
 
                 with torch.no_grad():
-                    for i, (input_test, lbl_test) in enumerate(valid_loader):
+                    for batch_idx, (input_test, lbl_test) in enumerate(valid_loader):
                         input_test = input_test.view(-1, MNIST_DIM)
                         input_test = input_test[:, task_permutation].to(device)
                         lbl_test = lbl_test.squeeze(0).to(device)
