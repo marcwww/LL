@@ -417,14 +417,16 @@ class MbPAMLP(MLP):
             out = tester(mem)
             out = out.view(-1, out.shape[-1])
             lbl = lbl.view(-1)
-            posterior = F.cross_entropy(out, lbl.squeeze(0), reduce=False)
-            posterior = posterior.view(-1, bsz)
-            context_loss = (top_vals * posterior).sum(dim=0)
-            paramDis_loss = self._dis_parameters(model_base=self,
-                                                 model=tester)
-
-            losses = paramDis_loss + context_loss
-            loss = losses.sum() / bsz
+            posterior = F.cross_entropy(out, lbl.squeeze(0))
+            loss = posterior
+            # posterior = F.cross_entropy(out, lbl.squeeze(0), reduce=False)
+            # posterior = posterior.view(-1, bsz)
+            # context_loss = (top_vals * posterior).sum(dim=0)
+            # paramDis_loss = self._dis_parameters(model_base=self,
+            #                                      model=tester)
+            #
+            # losses = paramDis_loss + context_loss
+            # loss = losses.sum() / bsz
             loss.backward()
             optimizer.step()
 
