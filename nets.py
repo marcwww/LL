@@ -431,7 +431,7 @@ class MbPAMLP(MLP):
             posterior = F.cross_entropy(out, lbl.squeeze(0), reduce=False)
             posterior = posterior.view(-1, bsz)
             context_loss = (top_vals * posterior).sum(dim=0)
-            loss = context_loss/bsz
+            loss = context_loss.sum()/bsz
             # paramDis_loss = self._dis_parameters(model_base=self,
             #                                      model=tester)
             #
