@@ -346,8 +346,8 @@ class MbPAMLP(MLP):
         self.nsteps = 0
         self.add_per = add_per
         self.epsilon = 1e-4
-        self.update_steps = 41
-        self.lr = 1e-3
+        self.update_steps = 10
+        self.lr = 1e-1
         self.lambda_cache = 0.15
         self.lambda_mbpa = 0.1
         self.K = 128
@@ -454,37 +454,37 @@ class MbPAMLP(MLP):
             loss.backward()
             optimizer.step()
 
-            # if deep_test:
-            #     tester.eval()
-            #     pred_lst = []
-            #     true_lst = []
-            #
-            #     with torch.no_grad():
-            #         for batch_idx, (input_test, lbl_test) in enumerate(valid_loader):
-            #             input_test = input_test.view(-1, MNIST_DIM)
-            #             input_test = input_test[:, task_permutation].to(device)
-            #             lbl_test = lbl_test.squeeze(0).to(device)
-            #             # probs: (bsz, 3)
-            #
-            #             out = tester(input_test)
-            #
-            #             pred = out.max(dim=1)[1].cpu().numpy()
-            #             lbl_test = lbl_test.cpu().numpy()
-            #             pred_lst.extend(pred)
-            #             true_lst.extend(lbl_test)
-            #
-            #     accurracy = accuracy_score(true_lst, pred_lst)
-            #     precision = precision_score(true_lst, pred_lst, average='macro')
-            #     recall = recall_score(true_lst, pred_lst, average='macro')
-            #     f1 = f1_score(true_lst, pred_lst, average='macro')
-            #
-            #     # if step_idx >= 15:
-            #     #     optimizer.param_groups[0]['lr'] = self.lr/10
-            #
-            #     print('deep_test %d/%d:' % (step_idx,self.update_steps),
-            #           context_loss.item(),
-            #           paramDis_loss.item(),
-            #           f1)
+            if deep_test:
+                tester.eval()
+                pred_lst = []
+                true_lst = []
+
+                with torch.no_grad():
+                    for batch_idx, (input_test, lbl_test) in enumerate(valid_loader):
+                        input_test = input_test.view(-1, MNIST_DIM)
+                        input_test = input_test[:, task_permutation].to(device)
+                        lbl_test = lbl_test.squeeze(0).to(device)
+                        # probs: (bsz, 3)
+
+                        out = tester(input_test)
+
+                        pred = out.max(dim=1)[1].cpu().numpy()
+                        lbl_test = lbl_test.cpu().numpy()
+                        pred_lst.extend(pred)
+                        true_lst.extend(lbl_test)
+
+                accurracy = accuracy_score(true_lst, pred_lst)
+                precision = precision_score(true_lst, pred_lst, average='macro')
+                recall = recall_score(true_lst, pred_lst, average='macro')
+                f1 = f1_score(true_lst, pred_lst, average='macro')
+
+                # if step_idx >= 15:
+                #     optimizer.param_groups[0]['lr'] = self.lr/10
+
+                print('deep_test %d/%d:' % (step_idx,self.update_steps),
+                      context_loss.item(),
+                      paramDis_loss.item(),
+                      f1)
 
         out = tester(input)
 
