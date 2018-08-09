@@ -343,12 +343,12 @@ class MbPAMLP(MLP):
         self.alpha_m = 10
         self.device = device
 
-    def adapt(self, inputs, lbls, domain):
-        if domain == 0:
-            if self.nsteps % self.add_per == 0:
-                self.mem.add(inputs, lbls)
-            if self.nsteps % self.add_per == 0:
-                self.mem.add(inputs, lbls)
+    def adapt(self, inputs, lbls):
+
+        if self.nsteps % self.add_per == 0:
+            self.mem.add(inputs, lbls)
+        if self.nsteps % self.add_per == 0:
+            self.mem.add(inputs, lbls)
 
         out = self.generator(inputs)
         loss = self.criterion(out, lbls.squeeze(0))

@@ -11,7 +11,7 @@ def model_opts(parser):
     group.add_argument('-pretrain', type=str, default="glove.6B.200d")
     group.add_argument('-nclasses', type=int, default=10)
     # group.add_argument('-pretrain', type=str, default=None)
-    group.add_argument('-capacity', type=int, default=5000)
+    group.add_argument('-capacity', type=int, default=20000)
     group.add_argument('-add_per', type=int, default=320)
 
 def train_opts(parser):

@@ -10,8 +10,8 @@ import sys
 import demjson
 import crash_on_ipy
 
-flog = 'rammlp_add-per-100.log'
-# flog = 'mbpamlp.log'
+# flog = 'rammlp_add-per-100.log'
+flog = 'mbpamlp.log'
 with open(os.path.join(RES, flog), 'r') as f:
     lines = f.readlines()
     maps = []
