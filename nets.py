@@ -339,7 +339,7 @@ class MbPAMLP(MLP):
         self.lr = 1e-3
         self.lambda_cache = 0.15
         self.lambda_mbpa = 0.1
-        self.K = 256
+        self.K = 512
         self.alpha_m = 1
         self.device = device
 
