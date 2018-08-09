@@ -473,7 +473,7 @@ class MbPAMLP(MLP):
 
                 print('deep_test %d/%d:' % (step_idx,self.update_steps),
                       context_loss.item(),
-                      paramDis_loss.item(),
+                      # paramDis_loss.item(),
                       f1)
 
         out = tester(input)
