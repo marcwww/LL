@@ -339,7 +339,7 @@ class MbPAMLP(MLP):
         self.lr = 1e-3
         self.lambda_cache = 0.15
         self.lambda_mbpa = 0.1
-        self.K = 512
+        self.K = 128
         self.alpha_m = 1
         self.device = device
 
@@ -401,7 +401,6 @@ class MbPAMLP(MLP):
         optimizer = optim.Adam(tester.parameters(),
                                    lr=self.lr)
         bsz, _ = input.shape
-
 
         mem = self.mem.mems_x if self.mem.is_full \
             else self.mem.mems_x[:self.mem.ptr+1]
