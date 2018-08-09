@@ -335,7 +335,7 @@ class MbPAMLP(MLP):
         self.nsteps = 0
         self.add_per = add_per
         self.epsilon = 1e-4
-        self.update_steps = 10
+        self.update_steps = 5
         self.lr = 1e-3
         self.lambda_cache = 0.15
         self.lambda_mbpa = 0.1
@@ -402,7 +402,7 @@ class MbPAMLP(MLP):
                                    lr=self.lr)
         bsz, _ = input.shape
 
-        for i in range(self.update_steps):
+        for step_idx in range(self.update_steps):
             tester.zero_grad()
             tester.train()
             mem = self.mem.mems_x if self.mem.is_full \
@@ -463,7 +463,7 @@ class MbPAMLP(MLP):
                 recall = recall_score(true_lst, pred_lst, average='macro')
                 f1 = f1_score(true_lst, pred_lst, average='macro')
 
-                print('deep_test %d:' % i, loss.item(), f1)
+                print('deep_test %d/%d:' % (step_idx,self.update_steps), loss.item(), f1)
 
         out = tester(input)
 
