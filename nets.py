@@ -336,7 +336,7 @@ class MbPAMLP(MLP):
         self.add_per = add_per
         self.epsilon = 1e-4
         self.update_steps = 10
-        self.lr = 1e-2
+        self.lr = 1e-3
         self.lambda_cache = 0.15
         self.lambda_mbpa = 0.1
         self.K = 256
@@ -396,7 +396,9 @@ class MbPAMLP(MLP):
         torch.set_grad_enabled(True)
 
         tester = self._new_mlp()
-        optimizer = optim.SGD(tester.parameters(),
+        # optimizer = optim.SGD(tester.parameters(),
+        #                            lr=self.lr)
+        optimizer = optim.Adam(tester.parameters(),
                                    lr=self.lr)
         bsz, _ = input.shape
 
