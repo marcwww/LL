@@ -335,12 +335,12 @@ class MbPAMLP(MLP):
         self.nsteps = 0
         self.add_per = add_per
         self.epsilon = 1e-4
-        self.update_steps = 5
-        self.lr = 1e-2
+        self.update_steps = 40
+        self.lr = 1e-3
         self.lambda_cache = 0.15
         self.lambda_mbpa = 0.1
         self.K = 128
-        self.alpha_m = 1
+        self.alpha_m = 10
         self.device = device
 
     def adapt(self, inputs, lbls, domain):
@@ -433,13 +433,13 @@ class MbPAMLP(MLP):
             posterior = posterior.view(-1, bsz)
             context_loss = (top_vals * posterior).sum(dim=0)
             context_loss = context_loss.sum()/bsz
-            # paramDis_loss = self._dis_parameters(model_base=self,
-            #                                      model=tester)
-            #
+            paramDis_loss = self._dis_parameters(model_base=self,
+                                                 model=tester)
+
             # losses = paramDis_loss + context_loss
             # loss = losses.sum() / bsz
-            # loss = (context_loss + paramDis_loss)/2
-            loss = context_loss
+            loss = (context_loss + paramDis_loss)/2
+            # loss = context_loss
             loss.backward()
             optimizer.step()
 
@@ -472,7 +472,7 @@ class MbPAMLP(MLP):
 
                 print('deep_test %d/%d:' % (step_idx,self.update_steps),
                       context_loss.item(),
-                      # paramDis_loss.item(),
+                      paramDis_loss.item(),
                       f1)
 
         out = tester(input)
