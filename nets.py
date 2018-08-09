@@ -434,12 +434,13 @@ class MbPAMLP(MLP):
             posterior = posterior.view(-1, bsz)
             context_loss = (top_vals * posterior).sum(dim=0)
             context_loss = context_loss.sum()/bsz
-            paramDis_loss = self._dis_parameters(model_base=self,
-                                                 model=tester)
+            # paramDis_loss = self._dis_parameters(model_base=self,
+            #                                      model=tester)
             #
             # losses = paramDis_loss + context_loss
             # loss = losses.sum() / bsz
-            loss = (context_loss + paramDis_loss)/2
+            # loss = (context_loss + paramDis_loss)/2
+            loss = context_loss
             loss.backward()
             optimizer.step()
 
@@ -467,8 +468,8 @@ class MbPAMLP(MLP):
                 recall = recall_score(true_lst, pred_lst, average='macro')
                 f1 = f1_score(true_lst, pred_lst, average='macro')
 
-                if step_idx >= 15:
-                    optimizer.param_groups[0]['lr'] = self.lr/10
+                # if step_idx >= 15:
+                #     optimizer.param_groups[0]['lr'] = self.lr/10
 
                 print('deep_test %d/%d:' % (step_idx,self.update_steps),
                       context_loss.item(),
