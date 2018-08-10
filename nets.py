@@ -694,12 +694,24 @@ class GradientMemory(BaseMemory):
             self.ptr %= self.capacity
 
     def trim(self):
-        gnorms = self.mems_g[self.ld_ptr:self.ptr]
-        K = int(len(gnorms) * self.retain_ratio)
-        top_gnorms, top_idices = torch.topk(gnorms, k=K)
+        if self.ld_ptr< self.ptr:
+            gs = self.mems_g[self.ld_ptr:self.ptr]
+            xs = self.mems_x[self.ld_ptr:self.ptr]
+            ys = self.mems_y[self.ld_ptr:self.ptr]
+        else:
+            gs = torch.cat([self.mems_g[self.ld_ptr:],
+                            self.mems_g[:self.ptr]], dim=0)
+            xs = torch.cat([self.mems_x[self.ld_ptr:],
+                            self.mems_x[:self.ptr]], dim=0)
+            ys = torch.cat([self.mems_y[self.ld_ptr:],
+                            self.mems_y[:self.ptr]], dim=0)
+
+        K = int(len(gs) * self.retain_ratio)
+        top_gnorms, top_idices = torch.topk(gs, k=K)
         num = len(top_idices)
-        self.mems_x[self.ld_ptr:self.ld_ptr + num] = self.mems_x[top_idices]
-        self.mems_y[self.ld_ptr:self.ld_ptr + num] = self.mems_y[top_idices]
+        self.mems_x[self.ld_ptr:self.ld_ptr + num] = xs[top_idices]
+        self.mems_y[self.ld_ptr:self.ld_ptr + num] = ys[top_idices]
+        self.mems_g[self.ld_ptr:self.ld_ptr + num] = gs[top_idices]
         self.ptr = self.ld_ptr + num
 
         if self.ptr < self.capacity:
