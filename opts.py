@@ -11,12 +11,10 @@ def model_opts(parser):
     group.add_argument('-pretrain', type=str, default="glove.6B.200d")
     group.add_argument('-nclasses', type=int, default=10)
     # group.add_argument('-pretrain', type=str, default=None)
-    group.add_argument('-capacity', type=int, default=60000)
-    group.add_argument('-capacity_tmp', type=int, default=10000)
+    group.add_argument('-capacity', type=int, default=200000)
     # group.add_argument('-add_per', type=int, default=320)
     group.add_argument('-add_per', type=int, default=1)
-    group.add_argument('-retain_ratio', type=float, default=0.5)
-    group.add_argument('-retain_ratio_tmp', type=float, default=0.3)
+    group.add_argument('-retain_ratio', type=float, default=0.05)
 
 def train_opts(parser):
     group = parser.add_argument_group('train')
@@ -34,7 +32,7 @@ def train_opts(parser):
     group.add_argument('-bsz', type=int, default=32)
     group.add_argument('-min_freq', type=int, default=1)
     # group.add_argument('-nepoch', type=int, default=5)
-    group.add_argument('-nepoch', type=int, default=1)
+    group.add_argument('-nepoch', type=int, default=2)
     group.add_argument('-save_per', type=int, default=5)
     # group.add_argument('-name', type=str, default='rnn_atten_lm')
     # group.add_argument('-name', type=str, default='rammlp_add-per-100')

@@ -55,8 +55,8 @@ def draw(flog, name):
 
 flogs = ['rammlp_add-per-100.log',
          'rammlp_add-per-1000.log',
-         'mbpamlp.log',
-         'gnimlp.log',
+         # 'mbpamlp.log',
+         'gnimlp_all.log',
          'gnimlp_fork.log',
          'mlp.log']
 

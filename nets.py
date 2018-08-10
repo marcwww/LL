@@ -236,26 +236,13 @@ class MLP2Layers(nn.Module):
         res = self.layer2(self.layer1(input))
         return res
 
-class BaselineMLP(MLP):
-
-    def __init__(self, idim, nclasses,
-                 criterion):
-        super(BaselineMLP, self).__init__(idim, nclasses)
-        self.criterion = criterion
-
-    def adapt(self, inputs, lbls):
-        out = self.forward(inputs)
-        lbl = lbls
-        loss = self.criterion(out, lbl.squeeze(0))
-        return loss
-
 class BaseMemory(nn.Module):
 
     def __init__(self, capacity, xdim):
         super(BaseMemory, self).__init__()
         self.capacity = capacity
         self.xdim = xdim
-        self.mems_x = nn.Parameter(torch.zeros(capacity, xdim),
+        self.mems_x = nn.Parameter(torch.Tensor(capacity, xdim),
                                  requires_grad=False)
         self.mems_y = nn.Parameter(torch.LongTensor(capacity),
                                    requires_grad=False)
@@ -667,9 +654,11 @@ class GradientMemory(BaseMemory):
     def __init__(self, capacity, xdim, retain_ratio):
         super(GradientMemory, self).__init__(capacity, xdim)
         # gradient norms
-        self.mems_g = nn.Parameter(torch.zeros(capacity),
+        self.mems_g = nn.Parameter(torch.Tensor(capacity),
                                    requires_grad=False)
         self.ptr = 0
+        # pointer for last domian
+        self.ld_ptr = 0
         self.is_full = False
         self.retain_ratio = retain_ratio
 
@@ -692,13 +681,6 @@ class GradientMemory(BaseMemory):
                torch.cat(res_y, dim=0), \
                torch.cat(res_g, dim=0)
 
-    def all_content(self):
-        gs = self.mems_g[:self.ptr]
-        xs = self.mems_x[:self.ptr]
-        ys = self.mems_y[:self.ptr]
-
-        return xs, ys, gs
-
     def add(self, inputs, lbls, gnorms):
         for input, lbl, gnorm in zip(inputs, lbls, gnorms):
             self.mems_x[self.ptr] = input.data
@@ -707,42 +689,45 @@ class GradientMemory(BaseMemory):
 
             self.ptr += 1
             if self.ptr >= self.capacity:
-                # self.is_full = True
-                self.trim()
+                self.is_full = True
 
             self.ptr %= self.capacity
 
     def trim(self):
-        gs = self.mems_g[:self.ptr]
-        xs = self.mems_x[:self.ptr]
-        ys = self.mems_y[:self.ptr]
+        if self.ld_ptr< self.ptr:
+            gs = self.mems_g[self.ld_ptr:self.ptr]
+            xs = self.mems_x[self.ld_ptr:self.ptr]
+            ys = self.mems_y[self.ld_ptr:self.ptr]
+        else:
+            gs = torch.cat([self.mems_g[self.ld_ptr:],
+                            self.mems_g[:self.ptr]], dim=0)
+            xs = torch.cat([self.mems_x[self.ld_ptr:],
+                            self.mems_x[:self.ptr]], dim=0)
+            ys = torch.cat([self.mems_y[self.ld_ptr:],
+                            self.mems_y[:self.ptr]], dim=0)
 
         K = int(len(gs) * self.retain_ratio)
         top_gnorms, top_idices = torch.topk(gs, k=K)
         num = len(top_idices)
-        self.mems_x[:num] = xs[top_idices]
-        self.mems_y[:num] = ys[top_idices]
-        self.mems_g[:num] = gs[top_idices]
-        self.ptr = num
+        self.mems_x[self.ld_ptr:self.ld_ptr + num] = xs[top_idices]
+        self.mems_y[self.ld_ptr:self.ld_ptr + num] = ys[top_idices]
+        self.mems_g[self.ld_ptr:self.ld_ptr + num] = gs[top_idices]
+        self.ptr = self.ld_ptr + num
 
         if self.ptr < self.capacity:
             self.is_full = False
 
+        self.ld_ptr = self.ptr
+
 class GNIMLP(MLP):
 
     def __init__(self, idim, nclasses, capacity,
-                 capacity_tmp, criterion, add_per,
-                 retain_ratio, retain_ratio_tmp,
+                 criterion, add_per, retain_ratio,
                  device):
 
         super(GNIMLP, self).__init__(idim, nclasses)
-        self.capacity = capacity
-        self.capacity_tmp = capacity_tmp
-        self.idim = idim
-        self.retain_ratio = retain_ratio
-        self.retain_ratio_tmp = retain_ratio_tmp
         self.mem = GradientMemory(capacity, idim, retain_ratio)
-        self.mem_tmp = self._create_tmp_mem()
+        self.idim = idim
         self.nclasses = nclasses
         self.nsteps = 0
         self.criterion = criterion
@@ -759,37 +744,20 @@ class GNIMLP(MLP):
 
         return new_model.to(self.device)
 
-    def _fetch(self, inputs):
-        xs, ys, gs = self.mem.all_content()
-        xs_t, ys_t, gs_t = self.mem_tmp.all_content()
-        xs = torch.cat([xs, xs_t], dim=0)
-        ys = torch.cat([ys, ys_t], dim=0)
-        gs = torch.cat([gs, gs_t], dim=0)
-
-        bsz = inputs.shape[0]
-        res_x = []
-        res_y = []
-        res_g = []
-        length = len(xs)
-        if length == 0:
-            return None, None, None
-
-        for i in np.random.choice(length, bsz):
-            res_x.append(xs[i].unsqueeze(0))
-            res_y.append(ys[i].unsqueeze(0))
-            res_g.append(gs[i].unsqueeze(0))
-
-        return torch.cat(res_x, dim=0), \
-               torch.cat(res_y, dim=0), \
-               torch.cat(res_g, dim=0)
-
-
-
     def adapt(self, inputs, lbls):
-        # fetch from the past not the temp memory
-        # context_x, context_y, context_g = self.mem.fetch(inputs)
-        context_x, context_y, context_g = self._fetch(inputs)
+        context_x, context_y, context_g = self.mem.fetch(inputs)
 
+        # out = self.forward(inputs)
+        # self.criterion.reduce = False
+        # loss_out = self.criterion(out, lbls.squeeze(0))
+        # self.criterion.reduce = True
+        # gnorms = []
+        # for loss in loss_out:
+        #     self.zero_grad()
+        #     loss.backward(retain_graph=True)
+        #     gnorm = utils.grad_norm(self.parameters())
+        #     gnorms.append(gnorm)
+        # self.zero_grad()
         out = self.baby_mlp(inputs)
         self.criterion.reduce = False
         loss_out = self.criterion(out, lbls.squeeze(0))
@@ -803,8 +771,7 @@ class GNIMLP(MLP):
         self.baby_mlp.zero_grad()
 
         if self.nsteps % self.add_per == 0:
-            # using temp memory to record
-            self.mem_tmp.add(inputs, lbls, gnorms)
+            self.mem.add(inputs, lbls, gnorms)
 
         if context_x is not None and \
                 context_x is not None:
@@ -819,23 +786,9 @@ class GNIMLP(MLP):
 
         return loss
 
-    def _create_tmp_mem(self):
-        return GradientMemory(self.capacity_tmp, self.idim, self.retain_ratio_tmp)
-
     def trim(self):
-        self.mem_tmp.trim()
-        inputs, lbls, gnorms = self.mem_tmp.all_content()
-
-        # transfer the samples from temp memory
-        self.mem.add(inputs, lbls, gnorms)
-        self.mem_tmp = self._create_tmp_mem()
-
-        # fork to be prepared for the next domain
+        self.mem.trim()
         self.baby_mlp = self._fork()
-
-
-
-
 
 
 
