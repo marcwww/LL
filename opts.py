@@ -38,7 +38,7 @@ def train_opts(parser):
     # group.add_argument('-name', type=str, default='rammlp_add-per-100')
     # group.add_argument('-name', type=str, default='mbpamlp2layers')
     # group.add_argument('-name', type=str, default='mbpamlp')
-    group.add_argument('-name', type=str, default='gnimlp')
+    group.add_argument('-name', type=str, default='gnimlp_fork')
     group.add_argument('-gpu', type=int, default=-1)
     group.add_argument('-lr', type=float, default=1e-3)
     # group.add_argument('-lm_coef', type=float, default=0.5)
