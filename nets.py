@@ -737,10 +737,10 @@ class GNIMLP(MLP):
 
     def _fork(self):
         new_model = MLP(self.idim, self.nclasses)
-        params = dict(new_model.named_parameters())
+        new_model_params = dict(new_model.named_parameters())
         for name, param in self.named_parameters():
-            if param.requires_grad:
-                params[name].data.copy_(param.data)
+            if param.requires_grad and name in new_model_params.keys():
+                new_model_params[name].data.copy_(param.data)
 
         return new_model.to(self.device)
 
