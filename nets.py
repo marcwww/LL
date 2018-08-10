@@ -692,6 +692,13 @@ class GradientMemory(BaseMemory):
                torch.cat(res_y, dim=0), \
                torch.cat(res_g, dim=0)
 
+    def all_content(self):
+        gs = self.mems_g[:self.ptr]
+        xs = self.mems_x[:self.ptr]
+        ys = self.mems_y[:self.ptr]
+
+        return xs, ys, gs
+
     def add(self, inputs, lbls, gnorms):
         for input, lbl, gnorm in zip(inputs, lbls, gnorms):
             self.mems_x[self.ptr] = input.data
@@ -786,9 +793,8 @@ class GNIMLP(MLP):
 
     def trim(self):
         self.mem_tmp.trim()
-        inputs, lbls, gnorms = self.mem_tmp.mems_x, \
-                               self.mem_tmp.mems_y, \
-                               self.mem_tmp.mems_g
+        inputs, lbls, gnorms = self.mem_tmp.all_content()
+
         # transfer the samples from temp memory
         self.mem.add(inputs, lbls, gnorms)
         self.mem_tmp = self._create_tmp_mem()
