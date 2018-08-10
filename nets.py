@@ -727,6 +727,8 @@ class GNIMLP(MLP):
 
         super(GNIMLP, self).__init__(idim, nclasses)
         self.mem = GradientMemory(capacity, idim, retain_ratio)
+        self.idim = idim
+        self.nclasses = nclasses
         self.nsteps = 0
         self.criterion = criterion
         self.add_per = add_per
