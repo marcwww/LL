@@ -24,7 +24,8 @@ def valid_mnist(model, valid_loader, task_permutation, deep_test, device):
             lbl = lbl.squeeze(0).to(device)
             # probs: (bsz, 3)
 
-            out = model(input, valid_loader, task_permutation, deep_test, device)
+            # out = model(input, valid_loader, task_permutation, deep_test, device)
+            out = model(input)
 
             pred = out.max(dim=1)[1].cpu().numpy()
             lbl = lbl.cpu().numpy()
@@ -119,6 +120,9 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
         accurracy, precision, recall, f1 = best_metrics[main_domain]
         print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
               (best_epoch, main_domain, accurracy, precision, recall, f1), file=print_to)
+
+    if type(model).__name__ == 'GNIMLP':
+        model.trim()
 
     location = {'cuda:' + str(opt.gpu): 'cuda:' + str(opt.gpu)} if opt.gpu != -1 else 'cpu'
     model_dict = torch.load(best_model, map_location=location)

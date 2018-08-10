@@ -1,4 +1,5 @@
-print('aa',end='')
-print('aaa',end='')
-print('aaaa',end='')
-print('aaaaa',end='')
+import time
+
+t1=time.time()
+t2=time.time()
+print(t2-t1)

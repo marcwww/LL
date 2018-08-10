@@ -67,14 +67,14 @@ if __name__ == '__main__':
                                transforms.ToTensor(),
                                transforms.Normalize((0.1307,), (0.3081,))
                            ])),
-            batch_size=opt.bsz, shuffle=True,)
+            batch_size=opt.bsz, shuffle=False,)
             # **kwargs)
         valid_loader = torch.utils.data.DataLoader(
             datasets.MNIST('../data', train=False, transform=transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize((0.1307,), (0.3081,))
             ])),
-            batch_size=opt.bsz, shuffle=True,)
+            batch_size=opt.bsz, shuffle=False,)
             # **kwargs)
 
     model = None
@@ -137,6 +137,14 @@ if __name__ == '__main__':
                             criterion = nn.CrossEntropyLoss(),
                             add_per=opt.add_per,
                             device=device).to(device)
+
+    if opt.net == 'gnimlp':
+        model = nets.GNIMLP(idim=opt.idim,
+                            nclasses=nclasses,
+                            capacity=opt.capacity,
+                            criterion=nn.CrossEntropyLoss(),
+                            add_per=opt.add_per,
+                            retain_ratio=opt.retain_ratio).to(device)
 
     utils.init_seed(opt.seed)
     utils.init_model(model)
