@@ -255,7 +255,7 @@ class BaseMemory(nn.Module):
         super(BaseMemory, self).__init__()
         self.capacity = capacity
         self.xdim = xdim
-        self.mems_x = nn.Parameter(torch.Tensor(capacity, xdim),
+        self.mems_x = nn.Parameter(torch.zeros(capacity, xdim),
                                  requires_grad=False)
         self.mems_y = nn.Parameter(torch.LongTensor(capacity),
                                    requires_grad=False)
@@ -667,7 +667,7 @@ class GradientMemory(BaseMemory):
     def __init__(self, capacity, xdim, retain_ratio):
         super(GradientMemory, self).__init__(capacity, xdim)
         # gradient norms
-        self.mems_g = nn.Parameter(torch.Tensor(capacity),
+        self.mems_g = nn.Parameter(torch.zeros(capacity),
                                    requires_grad=False)
         self.ptr = 0
         self.is_full = False

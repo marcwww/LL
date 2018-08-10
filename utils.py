@@ -70,8 +70,18 @@ def avg_vector(i, n):
 
 def init_model(model):
     for p in model.parameters():
-        if p.dim() > 1:
+        if p.dim() > 1 and p.requires_grad:
             xavier_uniform_(p)
+
+def filter_state_dict(state_dict):
+    keys = []
+    for k in state_dict.keys():
+        if not state_dict[k].requires_grad:
+            keys.append(k)
+    for k in keys:
+        state_dict.pop(k)
+
+    return state_dict
 
 def progress_bar(percent, last_loss, epoch):
     """Prints the progress until the next report."""
