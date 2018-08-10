@@ -147,11 +147,6 @@ if __name__ == '__main__':
                             retain_ratio=opt.retain_ratio,
                             device=device).to(device)
 
-    if opt.net == 'baselinemlp':
-        model = nets.BaselineMLP(idim=opt.idim,
-                                 nclasses=nclasses,
-                                 criterion=nn.CrossEntropyLoss()).to(device)
-
     utils.init_seed(opt.seed)
     utils.init_model(model)
 

@@ -121,12 +121,13 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
         print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
               (best_epoch, main_domain, accurracy, precision, recall, f1), file=print_to)
 
+    if type(model).__name__ == 'GNIMLP':
+        model.trim()
+
     location = {'cuda:' + str(opt.gpu): 'cuda:' + str(opt.gpu)} if opt.gpu != -1 else 'cpu'
     model_dict = torch.load(best_model, map_location=location)
     model.load_state_dict(model_dict)
 
-    if type(model).__name__ == 'GNIMLP':
-        model.trim()
 
 
 def train_ll_mnist(model, dataloaders, opt, optim):
