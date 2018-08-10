@@ -722,28 +722,51 @@ class GradientMemory(BaseMemory):
 class GNIMLP(MLP):
 
     def __init__(self, idim, nclasses, capacity,
-                 criterion, add_per, retain_ratio):
+                 criterion, add_per, retain_ratio,
+                 device):
 
         super(GNIMLP, self).__init__(idim, nclasses)
         self.mem = GradientMemory(capacity, idim, retain_ratio)
         self.nsteps = 0
         self.criterion = criterion
         self.add_per = add_per
+        self.device = device
+        self.baby_mlp = self._fork()
+
+    def _fork(self):
+        new_model = MLP(self.idim, self.nclasses)
+        params = dict(new_model.named_parameters())
+        for name, param in self.named_parameters():
+            if param.requires_grad:
+                params[name].data.copy_(param.data)
+
+        return new_model.to(self.device)
 
     def adapt(self, inputs, lbls):
         context_x, context_y, context_g = self.mem.fetch(inputs)
 
-        out = self.forward(inputs)
+        # out = self.forward(inputs)
+        # self.criterion.reduce = False
+        # loss_out = self.criterion(out, lbls.squeeze(0))
+        # self.criterion.reduce = True
+        # gnorms = []
+        # for loss in loss_out:
+        #     self.zero_grad()
+        #     loss.backward(retain_graph=True)
+        #     gnorm = utils.grad_norm(self.parameters())
+        #     gnorms.append(gnorm)
+        # self.zero_grad()
+        out = self.baby_mlp(inputs)
         self.criterion.reduce = False
         loss_out = self.criterion(out, lbls.squeeze(0))
         self.criterion.reduce = True
         gnorms = []
         for loss in loss_out:
-            self.zero_grad()
+            self.baby_mlp.zero_grad()
             loss.backward(retain_graph=True)
-            gnorm = utils.grad_norm(self.parameters())
+            gnorm = utils.grad_norm(self.baby_mlp.parameters())
             gnorms.append(gnorm)
-        self.zero_grad()
+        self.baby_mlp.zero_grad()
 
         if self.nsteps % self.add_per == 0:
             self.mem.add(inputs, lbls, gnorms)
@@ -763,6 +786,7 @@ class GNIMLP(MLP):
 
     def trim(self):
         self.mem.trim()
+        self.baby_mlp = self._fork()
 
 
 
