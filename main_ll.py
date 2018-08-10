@@ -142,9 +142,11 @@ if __name__ == '__main__':
         model = nets.GNIMLP(idim=opt.idim,
                             nclasses=nclasses,
                             capacity=opt.capacity,
+                            capacity_tmp=opt.capacity_tmp,
                             criterion=nn.CrossEntropyLoss(),
                             add_per=opt.add_per,
                             retain_ratio=opt.retain_ratio,
+                            retain_ratio_tmp=opt.retain_ratio_tmp,
                             device=device).to(device)
 
     if opt.net == 'baselinemlp':

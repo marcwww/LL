@@ -707,7 +707,8 @@ class GradientMemory(BaseMemory):
 
             self.ptr += 1
             if self.ptr >= self.capacity:
-                self.is_full = True
+                # self.is_full = True
+                self.trim()
 
             self.ptr %= self.capacity
 
@@ -730,13 +731,16 @@ class GradientMemory(BaseMemory):
 class GNIMLP(MLP):
 
     def __init__(self, idim, nclasses, capacity,
-                 criterion, add_per, retain_ratio,
+                 capacity_tmp, criterion, add_per,
+                 retain_ratio, retain_ratio_tmp,
                  device):
 
         super(GNIMLP, self).__init__(idim, nclasses)
         self.capacity = capacity
+        self.capacity_tmp = capacity_tmp
         self.idim = idim
         self.retain_ratio = retain_ratio
+        self.retain_ratio_tmp = retain_ratio_tmp
         self.mem = GradientMemory(capacity, idim, retain_ratio)
         self.mem_tmp = self._create_tmp_mem()
         self.nclasses = nclasses
@@ -755,9 +759,36 @@ class GNIMLP(MLP):
 
         return new_model.to(self.device)
 
+    def _fetch(self, inputs):
+        xs, ys, gs = self.mem.all_content()
+        xs_t, ys_t, gs_t = self.mem_tmp.all_content()
+        xs = torch.cat([xs, xs_t], dim=0)
+        ys = torch.cat([ys, ys_t], dim=0)
+        gs = torch.cat([gs, gs_t], dim=0)
+
+        bsz = inputs.shape[0]
+        res_x = []
+        res_y = []
+        res_g = []
+        length = len(xs)
+        if length == 0:
+            return None, None, None
+
+        for i in np.random.choice(length, bsz):
+            res_x.append(xs[i].unsqueeze(0))
+            res_y.append(ys[i].unsqueeze(0))
+            res_g.append(gs[i].unsqueeze(0))
+
+        return torch.cat(res_x, dim=0), \
+               torch.cat(res_y, dim=0), \
+               torch.cat(res_g, dim=0)
+
+
+
     def adapt(self, inputs, lbls):
         # fetch from the past not the temp memory
-        context_x, context_y, context_g = self.mem.fetch(inputs)
+        # context_x, context_y, context_g = self.mem.fetch(inputs)
+        context_x, context_y, context_g = self._fetch(inputs)
 
         out = self.baby_mlp(inputs)
         self.criterion.reduce = False
@@ -789,7 +820,7 @@ class GNIMLP(MLP):
         return loss
 
     def _create_tmp_mem(self):
-        return GradientMemory(self.capacity, self.idim, self.retain_ratio)
+        return GradientMemory(self.capacity_tmp, self.idim, self.retain_ratio_tmp)
 
     def trim(self):
         self.mem_tmp.trim()
