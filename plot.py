@@ -53,12 +53,10 @@ def draw(flog, name):
     plt.legend(loc=0)
 
 
-flog1 = 'rammlp_add-per-100.log'
-flog2 = 'rammlp_add-per-1000.log'
-flog3 = 'mbpamlp.log'
-draw(flog1, flog1)
-draw(flog2, flog2)
-draw(flog3, flog3)
+flogs = ['rammlp_add-per-100.log','rammlp_add-per-1000.log','mbpamlp.log','gnimlp.log','gnimlp_fork.log']
+for flog in flogs:
+    draw(flog, flog)
+
 plt.show()
 
 

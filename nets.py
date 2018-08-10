@@ -657,8 +657,6 @@ class GradientMemory(BaseMemory):
         self.mems_g = nn.Parameter(torch.Tensor(capacity),
                                    requires_grad=False)
         self.ptr = 0
-        # pointer for last domian
-        self.ld_ptr = 0
         self.is_full = False
         self.retain_ratio = retain_ratio
 
@@ -694,30 +692,20 @@ class GradientMemory(BaseMemory):
             self.ptr %= self.capacity
 
     def trim(self):
-        if self.ld_ptr< self.ptr:
-            gs = self.mems_g[self.ld_ptr:self.ptr]
-            xs = self.mems_x[self.ld_ptr:self.ptr]
-            ys = self.mems_y[self.ld_ptr:self.ptr]
-        else:
-            gs = torch.cat([self.mems_g[self.ld_ptr:],
-                            self.mems_g[:self.ptr]], dim=0)
-            xs = torch.cat([self.mems_x[self.ld_ptr:],
-                            self.mems_x[:self.ptr]], dim=0)
-            ys = torch.cat([self.mems_y[self.ld_ptr:],
-                            self.mems_y[:self.ptr]], dim=0)
+        gs = self.mems_g[:self.ptr]
+        xs = self.mems_x[:self.ptr]
+        ys = self.mems_y[:self.ptr]
 
         K = int(len(gs) * self.retain_ratio)
         top_gnorms, top_idices = torch.topk(gs, k=K)
         num = len(top_idices)
-        self.mems_x[self.ld_ptr:self.ld_ptr + num] = xs[top_idices]
-        self.mems_y[self.ld_ptr:self.ld_ptr + num] = ys[top_idices]
-        self.mems_g[self.ld_ptr:self.ld_ptr + num] = gs[top_idices]
-        self.ptr = self.ld_ptr + num
+        self.mems_x[:num] = xs[top_idices]
+        self.mems_y[:num] = ys[top_idices]
+        self.mems_g[:num] = gs[top_idices]
+        self.ptr = num
 
         if self.ptr < self.capacity:
             self.is_full = False
-
-        self.ld_ptr = self.ptr
 
 class GNIMLP(MLP):
 
@@ -726,8 +714,11 @@ class GNIMLP(MLP):
                  device):
 
         super(GNIMLP, self).__init__(idim, nclasses)
-        self.mem = GradientMemory(capacity, idim, retain_ratio)
+        self.capacity = capacity
         self.idim = idim
+        self.retain_ratio = retain_ratio
+        self.mem = GradientMemory(capacity, idim, retain_ratio)
+        self.mem_tmp = self._create_tmp_mem()
         self.nclasses = nclasses
         self.nsteps = 0
         self.criterion = criterion
@@ -745,6 +736,7 @@ class GNIMLP(MLP):
         return new_model.to(self.device)
 
     def adapt(self, inputs, lbls):
+        # fetch from the past not the temp memory
         context_x, context_y, context_g = self.mem.fetch(inputs)
 
         # out = self.forward(inputs)
@@ -771,7 +763,8 @@ class GNIMLP(MLP):
         self.baby_mlp.zero_grad()
 
         if self.nsteps % self.add_per == 0:
-            self.mem.add(inputs, lbls, gnorms)
+            # using temp memory to record
+            self.mem_tmp.add(inputs, lbls, gnorms)
 
         if context_x is not None and \
                 context_x is not None:
@@ -786,8 +779,19 @@ class GNIMLP(MLP):
 
         return loss
 
+    def _create_tmp_mem(self):
+        return GradientMemory(self.capacity, self.idim, self.retain_ratio)
+
     def trim(self):
-        self.mem.trim()
+        self.mem_tmp.trim()
+        inputs, lbls, gnorms = self.mem_tmp.mems_x, \
+                               self.mem_tmp.mems_y, \
+                               self.mem_tmp.mems_g
+        # transfer the samples from temp memory
+        self.mem.add(inputs, lbls, gnorms)
+        self.mem_tmp = self._create_tmp_mem()
+
+        # fork to be prepared for the next domain
         self.baby_mlp = self._fork()
 
 
