@@ -67,14 +67,14 @@ if __name__ == '__main__':
                                transforms.ToTensor(),
                                transforms.Normalize((0.1307,), (0.3081,))
                            ])),
-            batch_size=opt.bsz, shuffle=False,)
+            batch_size=opt.bsz, shuffle=True,)
             # **kwargs)
         valid_loader = torch.utils.data.DataLoader(
             datasets.MNIST('../data', train=False, transform=transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize((0.1307,), (0.3081,))
             ])),
-            batch_size=opt.bsz, shuffle=False,)
+            batch_size=opt.bsz, shuffle=True,)
             # **kwargs)
 
     model = None
@@ -146,6 +146,11 @@ if __name__ == '__main__':
                             add_per=opt.add_per,
                             retain_ratio=opt.retain_ratio,
                             device=device).to(device)
+
+    if opt.net == 'baselinemlp':
+        model = nets.BaselineMLP(idim=opt.idim,
+                                 nclasses=nclasses,
+                                 criterion=nn.CrossEntropyLoss()).to(device)
 
     utils.init_seed(opt.seed)
     utils.init_model(model)

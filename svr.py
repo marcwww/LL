@@ -71,10 +71,7 @@ def train(model, dataloaders, opt,
                 # valid
                 accurracy, precision, recall, f1 = \
                     valid(model, valid_loader, task_permutation, device)
-                performance = {'accuracy':accurracy,
-                               'precision':precision,
-                               'recall':recall,
-                               'f1':f1}
+
                 print('{\'Epoch\':%d, \'Format\':\'a/p/r/f\', '
                       '\'Metrics\':[%4f, %4f, %4f, %4f]}' %
                       (epoch, accurracy, precision, recall, f1))
@@ -149,8 +146,8 @@ def build_model(opt):
     location = opt.gpu if torch.cuda.is_available() and opt.gpu != -1 else 'cpu'
     device = torch.device(location)
     model = nets.MLP(opt.idim, opt.nclasses).to(device)
-    # task_permutation = np.random.permutation(784)
-    task_permutation = np.array(range(784))
+    task_permutation = np.random.permutation(784)
+    # task_permutation = np.array(range(784))
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(params=filter(lambda p: p.requires_grad, model.parameters()),
                            lr=opt.lr)

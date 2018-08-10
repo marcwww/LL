@@ -236,6 +236,19 @@ class MLP2Layers(nn.Module):
         res = self.layer2(self.layer1(input))
         return res
 
+class BaselineMLP(MLP):
+
+    def __init__(self, idim, nclasses,
+                 criterion):
+        super(BaselineMLP, self).__init__(idim, nclasses)
+        self.criterion = criterion
+
+    def adapt(self, inputs, lbls):
+        out = self.forward(inputs)
+        lbl = lbls
+        loss = self.criterion(out, lbl.squeeze(0))
+        return loss
+
 class BaseMemory(nn.Module):
 
     def __init__(self, capacity, xdim):
@@ -739,17 +752,6 @@ class GNIMLP(MLP):
         # fetch from the past not the temp memory
         context_x, context_y, context_g = self.mem.fetch(inputs)
 
-        # out = self.forward(inputs)
-        # self.criterion.reduce = False
-        # loss_out = self.criterion(out, lbls.squeeze(0))
-        # self.criterion.reduce = True
-        # gnorms = []
-        # for loss in loss_out:
-        #     self.zero_grad()
-        #     loss.backward(retain_graph=True)
-        #     gnorm = utils.grad_norm(self.parameters())
-        #     gnorms.append(gnorm)
-        # self.zero_grad()
         out = self.baby_mlp(inputs)
         self.criterion.reduce = False
         loss_out = self.criterion(out, lbls.squeeze(0))
@@ -793,6 +795,9 @@ class GNIMLP(MLP):
 
         # fork to be prepared for the next domain
         self.baby_mlp = self._fork()
+
+
+
 
 
 
