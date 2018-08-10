@@ -694,7 +694,7 @@ class GradientMemory(BaseMemory):
             self.ptr %= self.capacity
 
     def trim(self):
-        gnorms = self.mems_g[self.ld_ptr:]
+        gnorms = self.mems_g[self.ld_ptr:self.ptr]
         K = int(len(gnorms) * self.retain_ratio)
         top_gnorms, top_idices = torch.topk(gnorms, k=K)
         num = len(top_idices)
