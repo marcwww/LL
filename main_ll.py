@@ -62,7 +62,7 @@ if __name__ == '__main__':
         # kwargs = {'num_workers': 1, 'pin_memory': True} \
         #     if torch.cuda.is_available() and opt.gpu != -1 else {}
         train_loader = torch.utils.data.DataLoader(
-            datasets.MNIST('../data', train=True, download=True,
+            datasets.MNIST(os.path.join(DATA, MNIST), train=True, download=True,
                            transform=transforms.Compose([
                                transforms.ToTensor(),
                                transforms.Normalize((0.1307,), (0.3081,))
@@ -70,7 +70,7 @@ if __name__ == '__main__':
             batch_size=opt.bsz, shuffle=True,)
             # **kwargs)
         valid_loader = torch.utils.data.DataLoader(
-            datasets.MNIST('../data', train=False, transform=transforms.Compose([
+            datasets.MNIST(os.path.join(DATA, MNIST), train=False, transform=transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize((0.1307,), (0.3081,))
             ])),
