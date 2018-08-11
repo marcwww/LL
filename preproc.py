@@ -248,9 +248,6 @@ def build_iters_iMNIST(mnist_folder, bsz, device):
         transforms.Normalize((0.1307,), (0.3081,))
     ]))
 
-    train.train_data = train.train_data.to(device)
-    test.test_data = test.test_data.to(device)
-
     return index_iter(train, bsz, device), \
            index_iter(test, bsz, device)
 
