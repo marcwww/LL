@@ -183,7 +183,7 @@ def index(folder, ratio, encoding='ISO-8859-2'):
 
 class index_iter(object):
 
-    def __init__(self, data, bsz, shuffle=True):
+    def __init__(self, data, bsz, device, shuffle=True):
         self.data = data
         self.bsz = bsz
         self.shuffle = shuffle
@@ -191,6 +191,7 @@ class index_iter(object):
         self.batch_len = int(self.len/bsz)
         self.batch_idx = 0
         self.idx_seq = self._gen_idx_seq()
+        self.device = device
 
     def __iter__(self):
         return self
@@ -226,8 +227,8 @@ class index_iter(object):
             self.batch_idx += 1
 
             return idices, \
-                   torch.cat(batch_x, dim=0), \
-                   torch.cat(batch_y, dim=0)
+                   torch.cat(batch_x, dim=0).to(self.device), \
+                   torch.cat(batch_y, dim=0).to(self.device)
 
         self._restart()
         raise StopIteration()
@@ -250,8 +251,8 @@ def build_iters_iMNIST(mnist_folder, bsz, device):
     train.train_data = train.train_data.to(device)
     test.test_data = test.test_data.to(device)
 
-    return index_iter(train, bsz), \
-           index_iter(test, bsz)
+    return index_iter(train, bsz, device), \
+           index_iter(test, bsz, device)
 
 if __name__ == '__main__':
     # for CHEN:
