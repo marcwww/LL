@@ -59,23 +59,8 @@ if __name__ == '__main__':
                                 device=opt.gpu)
 
     if opt.dataset == MNIST:
-        # kwargs = {'num_workers': 1, 'pin_memory': True} \
-        #     if torch.cuda.is_available() and opt.gpu != -1 else {}
-        train_loader = torch.utils.data.DataLoader(
-            datasets.MNIST(os.path.join(DATA, MNIST), train=True, download=True,
-                           transform=transforms.Compose([
-                               transforms.ToTensor(),
-                               transforms.Normalize((0.1307,), (0.3081,))
-                           ])),
-            batch_size=opt.bsz, shuffle=True,)
-            # **kwargs)
-        valid_loader = torch.utils.data.DataLoader(
-            datasets.MNIST(os.path.join(DATA, MNIST), train=False, transform=transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize((0.1307,), (0.3081,))
-            ])),
-            batch_size=opt.bsz, shuffle=True,)
-            # **kwargs)
+        train_loader, valid_loader = \
+            preproc.build_iters_iMNIST(os.path.join(DATA, MNIST), opt.bsz, device)
 
     model = None
     nclasses = opt.nclasses
@@ -164,12 +149,12 @@ if __name__ == '__main__':
                           optimizer)
 
     if opt.dataset in CV_DATASETS:
-
         training_cv.train_ll_mnist(model,
                                    {'train':train_loader,
                                      'valid':valid_loader},
                                    opt,
                                    optimizer)
+
 
 
 

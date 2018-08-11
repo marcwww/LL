@@ -656,6 +656,8 @@ class GradientMemory(BaseMemory):
         # gradient norms
         self.mems_g = nn.Parameter(torch.Tensor(capacity),
                                    requires_grad=False)
+        self.mems_i = nn.Parameter(torch.LongTensor(capacity),
+                                   requires_grad=False)
         self.ptr = 0
         # pointer for last domian
         self.ld_ptr = 0
@@ -668,21 +670,26 @@ class GradientMemory(BaseMemory):
         res_x = []
         res_y = []
         res_g = []
+        res_i = []
         length = self.capacity if self.is_full else self.ptr
         if length == 0:
-            return None, None, None
+            return None, None, None, None
 
         for i in np.random.choice(length, bsz):
             res_x.append(self.mems_x[i].unsqueeze(0))
             res_y.append(self.mems_y[i].unsqueeze(0))
             res_g.append(self.mems_g[i].unsqueeze(0))
+            res_i.append(self.mems_i[i].unsqueeze(0))
 
-        return torch.cat(res_x, dim=0), \
+        return torch.cat(res_i, dim=0), \
+               torch.cat(res_x, dim=0), \
                torch.cat(res_y, dim=0), \
                torch.cat(res_g, dim=0)
 
-    def add(self, inputs, lbls, gnorms):
-        for input, lbl, gnorm in zip(inputs, lbls, gnorms):
+    def add(self, indices, inputs, lbls, gnorms):
+        for index, input, lbl, gnorm in \
+                zip(indices, inputs, lbls, gnorms):
+            self.mems_i[self.ptr] = int(index)
             self.mems_x[self.ptr] = input.data
             self.mems_y[self.ptr] = lbl
             self.mems_g[self.ptr] = gnorm
@@ -693,13 +700,17 @@ class GradientMemory(BaseMemory):
 
             self.ptr %= self.capacity
 
+    # called when done training on a domain
     def trim(self):
         print('before trimming:', self.ld_ptr, self.ptr)
         if self.ld_ptr< self.ptr:
+            indices = self.mems_i[self.ld_ptr:self.ptr]
             gs = self.mems_g[self.ld_ptr:self.ptr]
             xs = self.mems_x[self.ld_ptr:self.ptr]
             ys = self.mems_y[self.ld_ptr:self.ptr]
         else:
+            indices = torch.cat([self.mems_i[self.ld_ptr:],
+                            self.mems_i[:self.ptr]], dim=0)
             gs = torch.cat([self.mems_g[self.ld_ptr:],
                             self.mems_g[:self.ptr]], dim=0)
             xs = torch.cat([self.mems_x[self.ld_ptr:],
@@ -710,6 +721,7 @@ class GradientMemory(BaseMemory):
         K = int(len(gs) * self.retain_ratio)
         top_gnorms, top_idices = torch.topk(gs, k=K)
         num = len(top_idices)
+        self.mems_i[self.ld_ptr:self.ld_ptr + num] = indices[top_idices]
         self.mems_x[self.ld_ptr:self.ld_ptr + num] = xs[top_idices]
         self.mems_y[self.ld_ptr:self.ld_ptr + num] = ys[top_idices]
         self.mems_g[self.ld_ptr:self.ld_ptr + num] = gs[top_idices]
@@ -734,8 +746,9 @@ class GNIMLP(MLP):
         self.criterion = criterion
         self.add_per = add_per
 
-    def adapt(self, inputs, lbls):
-        context_x, context_y, context_g = self.mem.fetch(inputs)
+    def adapt(self, indices, inputs, lbls):
+        context_i, context_x, context_y, context_g = \
+            self.mem.fetch(inputs)
 
         out = self.forward(inputs)
         self.criterion.reduce = False
@@ -750,7 +763,7 @@ class GNIMLP(MLP):
         self.zero_grad()
 
         if self.nsteps % self.add_per == 0:
-            self.mem.add(inputs, lbls, gnorms)
+            self.mem.add(indices, inputs, lbls, gnorms)
 
         if context_x is not None and \
                 context_x is not None:

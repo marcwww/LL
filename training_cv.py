@@ -18,7 +18,7 @@ def valid_mnist(model, valid_loader, task_permutation, deep_test, device):
     true_lst = []
 
     with torch.no_grad():
-        for i, (input, lbl) in enumerate(valid_loader):
+        for i, (index, input, lbl) in enumerate(valid_loader):
             input = input.view(-1, MNIST_DIM)
             input = input[:, task_permutation].to(device)
             lbl = lbl.squeeze(0).to(device)
@@ -59,7 +59,7 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
         best_metrics = {}
         best_epoch = 0
         for epoch in range(opt.nepoch):
-            for i, (input, lbl) in enumerate(train_loader):
+            for i, (indices, input, lbl) in enumerate(train_loader):
 
                 length = len(train_loader)
 
@@ -69,7 +69,7 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
                 model.train()
 
                 model.zero_grad()
-                loss = model.adapt(input, lbl)
+                loss = model.adapt(indices, input, lbl)
                 loss.backward()
 
                 # clip_grad_norm_(model.parameters(), 5)

@@ -3,6 +3,8 @@ import os
 from macros import *
 import random
 import json
+import torch
+from torchvision import datasets, transforms
 import crash_on_ipy
 import codecs
 import numpy as np
@@ -179,6 +181,78 @@ def index(folder, ratio, encoding='ISO-8859-2'):
     with open(os.path.join(root, 'info.json'), 'wt') as f:
         f.write(json.dumps(info))
 
+class index_iter(object):
+
+    def __init__(self, data, bsz, shuffle=True):
+        self.data = data
+        self.bsz = bsz
+        self.shuffle = shuffle
+        self.len = len(data)
+        self.batch_len = int(self.len/bsz)
+        self.batch_idx = 0
+        self.idx_seq = self._gen_idx_seq()
+
+    def __iter__(self):
+        return self
+
+    def _gen_idx_seq(self):
+         return np.random.choice(self.len, self.len) \
+            if self.shuffle \
+            else range(self.len)
+
+    def _restart(self):
+        self.batch_idx = 0
+        self.idx_seq = self._gen_idx_seq()
+
+    def __len__(self):
+        return self.batch_len
+
+    def __next__(self):
+        if self.batch_idx < self.batch_len:
+            start = self.batch_idx * self.bsz
+            batch_x = []
+            batch_y = []
+            idices = []
+            for offset in range(self.bsz):
+                idx = start + offset
+                if idx >= self.len:
+                    self._restart()
+                    raise StopIteration()
+
+                batch_x.append(self.data[self.idx_seq[idx]][0])
+                batch_y.append(self.data[self.idx_seq[idx]][1].unsqueeze(0))
+                idices.append(self.idx_seq[idx])
+
+            self.batch_idx += 1
+
+            return idices, \
+                   torch.cat(batch_x, dim=0), \
+                   torch.cat(batch_y, dim=0)
+
+        self._restart()
+        raise StopIteration()
+
+def build_iters_iMNIST(mnist_folder, bsz, device):
+
+    train = datasets.MNIST(mnist_folder, train=True,
+                   download=True,
+                   transform=transforms.Compose([
+                       transforms.ToTensor(),
+                       transforms.Normalize((0.1307,), (0.3081,))
+                   ]))
+
+    test = datasets.MNIST(mnist_folder, train=False,
+                   transform=transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.1307,), (0.3081,))
+    ]))
+
+    train.train_data = train.train_data.to(device)
+    test.test_data = test.test_data.to(device)
+
+    return index_iter(train, bsz), \
+           index_iter(test, bsz)
+
 if __name__ == '__main__':
     # for CHEN:
     # split(CHEN, {'train':0.8,
@@ -190,11 +264,18 @@ if __name__ == '__main__':
     # unify(CHEN, 'test')
 
     # for MAN:
-    index(MAN, {'train':0.8,'test':0.2,'valid':0})
-    unify(MAN, 'train')
-    unify(MAN, 'test')
+    # index(MAN, {'train':0.8,'test':0.2,'valid':0})
+    # unify(MAN, 'train')
+    # unify(MAN, 'test')
 
+    device = torch.device('cpu')
+    train_iter, test_iter = build_iters_iMNIST(os.path.join(DATA, MNIST), 32, device)
 
+    for i, (indices, batch_x, batch_y) in enumerate(train_iter):
+        print(i)
+
+    for i, (indices, batch_x, batch_y) in enumerate(train_iter):
+        print(i)
 
 
 
