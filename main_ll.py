@@ -107,7 +107,7 @@ if __name__ == '__main__':
         model = nets.RAMMLP(idim=opt.idim,nclasses=nclasses,
                             capacity=opt.capacity,
                             criterion = nn.CrossEntropyLoss(),
-                            add_per=opt.add_per).to(device)
+                            bsz_sampling=opt.bsz_sampling).to(device)
 
     if opt.net == 'mbpamlp':
         model = nets.MbPAMLP(idim=opt.idim,nclasses=nclasses,
@@ -129,7 +129,15 @@ if __name__ == '__main__':
                             capacity=opt.capacity,
                             criterion=nn.CrossEntropyLoss(),
                             add_per=opt.add_per,
-                            retain_ratio=opt.retain_ratio).to(device)
+                            retain_ratio=opt.retain_ratio,
+                            device=device).to(device)
+
+    if opt.net == 'gsmlp':
+        model = nets.GSMLP(idim=opt.idim,
+                            nclasses=nclasses,
+                            capacity=opt.capacity,
+                            criterion=nn.CrossEntropyLoss(),
+                            bsz_sampling=opt.bsz_sampling).to(device)
 
     utils.init_seed(opt.seed)
     utils.init_model(model)

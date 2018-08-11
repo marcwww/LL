@@ -57,7 +57,10 @@ flogs = ['rammlp_add-per-10.log',
          'rammlp_add-per-100.log',
          'rammlp_add-per-1000.log',
          'mlp.log',
-         'gnimlp_no-fork.log']
+         'gni_label_balanced.log',
+         'gnimlp_no-fork.log',
+         'gnimlp_fork.log',
+         'gsmlp.log']
 
 for flog in flogs:
     draw(flog, flog)

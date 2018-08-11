@@ -12,6 +12,7 @@ from sklearn.metrics import f1_score, \
     precision_score, \
     recall_score, \
     accuracy_score
+import collections
 
 class BiRNN(nn.Module):
 
@@ -286,22 +287,29 @@ class RandomMemory(BaseMemory):
 
             self.ptr %= self.capacity
 
+    def all_content(self):
+        return self.mems_x[:self.ptr], \
+               self.mems_y[:self.ptr]
+
 # Random memory MLP
 class RAMMLP(MLP):
 
     def __init__(self, idim, nclasses, capacity,
-                 criterion, add_per):
+                 criterion, bsz_sampling):
 
         super(RAMMLP, self).__init__(idim, nclasses)
         self.mem = RandomMemory(capacity, idim)
         self.nsteps = 0
         self.criterion = criterion
-        self.add_per = add_per
+        self.bsz_sampling = bsz_sampling
 
-    def adapt(self, inputs, lbls):
+    def adapt(self, indices, inputs, lbls):
         context_x, context_y = self.mem.fetch(inputs)
-        if self.nsteps % self.add_per == 0:
-            self.mem.add(inputs, lbls)
+
+        indices = np.random.choice(len(inputs),
+                                   self.bsz_sampling)
+        self.mem.add(inputs[indices], lbls[indices])
+
         if context_x is not None and\
                 context_x is not None:
             out = self.forward(torch.cat([inputs, context_x], dim=0))
@@ -309,7 +317,7 @@ class RAMMLP(MLP):
         else:
             out = self.forward(inputs)
             lbl = lbls
-        loss = self.criterion(out, lbl.squeeze(0))
+        loss = self.criterion(out, lbl)
         self.nsteps +=1
         return loss
 
@@ -700,31 +708,76 @@ class GradientMemory(BaseMemory):
 
             self.ptr %= self.capacity
 
+    def _topk(self, Is, Xs, Gs, Ys, K):
+        top_gnorms, top_idices = torch.topk(Gs, k=K)
+        return Is[top_idices], \
+               Xs[top_idices], \
+               Ys[top_idices], \
+               Gs[top_idices]
+
     # called when done training on a domain
     def trim(self):
+
         print('before trimming:', self.ld_ptr, self.ptr)
         if self.ld_ptr< self.ptr:
-            indices = self.mems_i[self.ld_ptr:self.ptr]
-            gs = self.mems_g[self.ld_ptr:self.ptr]
-            xs = self.mems_x[self.ld_ptr:self.ptr]
-            ys = self.mems_y[self.ld_ptr:self.ptr]
+            Is = self.mems_i[self.ld_ptr:self.ptr]
+            Xs = self.mems_x[self.ld_ptr:self.ptr]
+            Ys = self.mems_y[self.ld_ptr:self.ptr]
+            Gs = self.mems_g[self.ld_ptr:self.ptr]
         else:
-            indices = torch.cat([self.mems_i[self.ld_ptr:],
+            Is = torch.cat([self.mems_i[self.ld_ptr:],
                             self.mems_i[:self.ptr]], dim=0)
-            gs = torch.cat([self.mems_g[self.ld_ptr:],
-                            self.mems_g[:self.ptr]], dim=0)
-            xs = torch.cat([self.mems_x[self.ld_ptr:],
+            Xs = torch.cat([self.mems_x[self.ld_ptr:],
                             self.mems_x[:self.ptr]], dim=0)
-            ys = torch.cat([self.mems_y[self.ld_ptr:],
+            Ys = torch.cat([self.mems_y[self.ld_ptr:],
                             self.mems_y[:self.ptr]], dim=0)
+            Gs = torch.cat([self.mems_g[self.ld_ptr:],
+                            self.mems_g[:self.ptr]], dim=0)
 
-        K = int(len(gs) * self.retain_ratio)
-        top_gnorms, top_idices = torch.topk(gs, k=K)
-        num = len(top_idices)
-        self.mems_i[self.ld_ptr:self.ld_ptr + num] = indices[top_idices]
-        self.mems_x[self.ld_ptr:self.ld_ptr + num] = xs[top_idices]
-        self.mems_y[self.ld_ptr:self.ld_ptr + num] = ys[top_idices]
-        self.mems_g[self.ld_ptr:self.ld_ptr + num] = gs[top_idices]
+        K = int(len(Gs) * self.retain_ratio)
+
+        hist_y = collections.defaultdict(int)
+        classes = collections.defaultdict()
+
+        for i, x, y, g in zip(Is, Xs, Ys, Gs):
+            hist_y[y.item()] += 1
+            if y.item() not in classes.keys():
+                classes[y.item()]={'i':[],'x':[],'y':[],'g':[]}
+
+            classes[y.item()]['i'].append(i.unsqueeze(0))
+            classes[y.item()]['x'].append(x.unsqueeze(0))
+            classes[y.item()]['y'].append(y.unsqueeze(0))
+            classes[y.item()]['g'].append(g.unsqueeze(0))
+
+        hist_y_min = hist_y[min(hist_y, key=lambda y: hist_y[y])]
+        nclasses = len(hist_y)
+        K_class = min(int(K / nclasses), hist_y_min)
+
+        res_i = []
+        res_x = []
+        res_y = []
+        res_g = []
+        for y in classes.keys():
+            Is = torch.cat(classes[y]['i'])
+            Xs = torch.cat(classes[y]['x'])
+            Ys = torch.cat(classes[y]['y'])
+            Gs = torch.cat(classes[y]['g'])
+            Is, Xs, Ys, Gs = self._topk(Is, Xs, Gs, Ys, K_class)
+            res_i.append(Is)
+            res_x.append(Xs)
+            res_y.append(Ys)
+            res_g.append(Gs)
+
+        res_i = torch.cat(res_i, dim=0)
+        res_x = torch.cat(res_x, dim=0)
+        res_y = torch.cat(res_y, dim=0)
+        res_g = torch.cat(res_g, dim=0)
+
+        num = K_class * nclasses
+        self.mems_i[self.ld_ptr:self.ld_ptr + num] = res_i
+        self.mems_x[self.ld_ptr:self.ld_ptr + num] = res_x
+        self.mems_y[self.ld_ptr:self.ld_ptr + num] = res_y
+        self.mems_g[self.ld_ptr:self.ld_ptr + num] = res_g
         self.ptr = self.ld_ptr + num
 
         if self.ptr < self.capacity:
@@ -733,10 +786,17 @@ class GradientMemory(BaseMemory):
         self.ld_ptr = self.ptr
         print('after trimming:', self.ld_ptr, self.ptr)
 
+    def all_content(self):
+        return self.mems_i[:self.ptr],\
+               self.mems_x[:self.ptr],\
+               self.mems_y[:self.ptr],\
+               self.mems_g[:self.ptr],
+
 class GNIMLP(MLP):
 
     def __init__(self, idim, nclasses, capacity,
-                 criterion, add_per, retain_ratio):
+                 criterion, add_per, retain_ratio,
+                 device):
 
         super(GNIMLP, self).__init__(idim, nclasses)
         self.mem = GradientMemory(capacity, idim, retain_ratio)
@@ -745,22 +805,33 @@ class GNIMLP(MLP):
         self.nsteps = 0
         self.criterion = criterion
         self.add_per = add_per
+        self.device = device
+        self.baby_mlp = self._fork()
+
+    def _fork(self):
+        new_model = MLP(self.idim, self.nclasses)
+        new_model_params = dict(new_model.named_parameters())
+        for name, param in self.named_parameters():
+            if param.requires_grad and name in new_model_params.keys():
+                new_model_params[name].data.copy_(param.data)
+
+        return new_model.to(self.device)
 
     def adapt(self, indices, inputs, lbls):
         context_i, context_x, context_y, context_g = \
             self.mem.fetch(inputs)
 
-        out = self.forward(inputs)
+        out = self.baby_mlp(inputs)
         self.criterion.reduce = False
         loss_out = self.criterion(out, lbls.squeeze(0))
         self.criterion.reduce = True
         gnorms = []
         for loss in loss_out:
-            self.zero_grad()
+            self.baby_mlp.zero_grad()
             loss.backward(retain_graph=True)
-            gnorm = utils.grad_norm(self.parameters())
+            gnorm = utils.grad_norm(self.baby_mlp.parameters())
             gnorms.append(gnorm)
-        self.zero_grad()
+        self.baby_mlp.zero_grad()
 
         if self.nsteps % self.add_per == 0:
             self.mem.add(indices, inputs, lbls, gnorms)
@@ -780,6 +851,53 @@ class GNIMLP(MLP):
 
     def trim(self):
         self.mem.trim()
+
+        Is, Xs, Ys, Gs = self.mem.all_content()
+        utils.draw_dist(Ys.data.numpy(), bins=10)
+
+# Gradient sampling memory
+class GSMLP(MLP):
+
+    def __init__(self, idim, nclasses, capacity,
+                 criterion, bsz_sampling):
+
+        super(GSMLP, self).__init__(idim, nclasses)
+        self.mem = RandomMemory(capacity, idim)
+        self.nsteps = 0
+        self.criterion = criterion
+        self.bsz_sampling = bsz_sampling
+
+
+    def adapt(self, indices, inputs, lbls):
+        context_x, context_y = self.mem.fetch(inputs)
+
+        out = self.forward(inputs)
+        self.criterion.reduce = False
+        loss_out = self.criterion(out, lbls.squeeze(0))
+        self.criterion.reduce = True
+        gnorms = []
+        for loss in loss_out:
+            self.zero_grad()
+            loss.backward(retain_graph=True)
+            gnorm = utils.grad_norm(self.parameters())
+            gnorms.append(gnorm.item())
+        self.zero_grad()
+        gnorms = np.array(gnorms)
+        gnorms /= gnorms.sum()
+        indices_sampled = np.random.choice(len(gnorms), self.bsz_sampling, p=gnorms)
+        self.mem.add(inputs[indices_sampled], lbls[indices_sampled])
+
+        if context_x is not None and\
+                context_x is not None:
+            out = self.forward(torch.cat([inputs, context_x], dim=0))
+            lbl = torch.cat([lbls, context_y], dim=0)
+        else:
+            out = self.forward(inputs)
+            lbl = lbls
+        loss = self.criterion(out, lbl.squeeze(0))
+        self.nsteps +=1
+        return loss
+
 
 
 

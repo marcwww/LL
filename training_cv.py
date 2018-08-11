@@ -130,6 +130,9 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
     model_dict = torch.load(best_model, map_location=location)
     model.load_state_dict(model_dict)
 
+    # Xs, Ys = model.mem.all_content()
+    # utils.draw_dist(Ys.data.numpy(), bins=10)
+
     # trim
     if type(model).__name__ == 'GNIMLP':
         model.trim()

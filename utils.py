@@ -8,6 +8,10 @@ import torch
 import random
 import matplotlib.pyplot as plt
 
+def draw_dist(data, bins):
+    plt.hist(data, bins=bins)
+    plt.show()
+
 def show_img(img):
     plt.figure()
     plt.imshow(img)
@@ -102,3 +106,6 @@ def select_1d(data, index, device):
     # res: (N)
     res = data.view(-1)[idx.view(-1)]
     return res
+
+if __name__ == '__main__':
+    draw_dist([1,2,3,1,2,3,2,1], 10)
