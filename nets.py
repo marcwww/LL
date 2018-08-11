@@ -306,9 +306,12 @@ class RAMMLP(MLP):
     def adapt(self, indices, inputs, lbls):
         context_x, context_y = self.mem.fetch(inputs)
 
-        indices = np.random.choice(len(inputs),
+        indices_sampled = np.random.choice(len(inputs),
                                    self.bsz_sampling)
-        self.mem.add(inputs[indices], lbls[indices])
+        indices_sampled = list(set(indices_sampled))
+
+        self.mem.add(inputs[indices_sampled],
+                     lbls[indices_sampled])
 
         if context_x is not None and\
                 context_x is not None:
@@ -885,6 +888,7 @@ class GSMLP(MLP):
         gnorms = np.array(gnorms)
         gnorms /= gnorms.sum()
         indices_sampled = np.random.choice(len(gnorms), self.bsz_sampling, p=gnorms)
+        indices_sampled = list(set(indices_sampled))
         self.mem.add(inputs[indices_sampled], lbls[indices_sampled])
 
         if context_x is not None and\

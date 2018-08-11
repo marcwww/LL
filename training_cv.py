@@ -132,6 +132,7 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
 
     # Xs, Ys = model.mem.all_content()
     # utils.draw_dist(Ys.data.numpy(), bins=10)
+    print(model.mem.ptr)
 
     # trim
     if type(model).__name__ == 'GNIMLP':
