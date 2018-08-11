@@ -53,12 +53,11 @@ def draw(flog, name):
     plt.legend(loc=0)
 
 
-flogs = ['rammlp_add-per-100.log',
+flogs = ['rammlp_add-per-10.log',
+         'rammlp_add-per-100.log',
          'rammlp_add-per-1000.log',
-         # 'mbpamlp.log',
-         'gnimlp_all.log',
-         'gnimlp_fork.log',
-         'mlp.log']
+         'mlp.log',
+         'gnimlp_no-fork.log']
 
 for flog in flogs:
     draw(flog, flog)

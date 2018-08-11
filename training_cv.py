@@ -93,9 +93,10 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
                             (epoch, domain, accurracy, precision, recall, f1))
 
                         # save model
-                        basename = "up-to-domain-{}-epoch-{}".format(domain, epoch)
-                        model_fname = basename + ".model"
-                        torch.save(model.state_dict(), model_fname)
+                        # basename = "up-to-domain-{}-epoch-{}".format(domain, epoch)
+                        basename = "up-to-domain-{}-epoch-{}".format(0, 0)
+                        model_fname = basename + ".pkl"
+                        torch.save(model, model_fname)
 
                         best_performance = performance[opt.metric]
                         best_model = model_fname
@@ -121,14 +122,14 @@ def train_domain_mnist(model, dataloaders, opt, domain, main_domain,
         print('{\'Epoch\':%d, \'Domain\':%d, \'Format\':\'a/p/r/f\', \'Metrics\':[%4f, %4f, %4f, %4f]}' %
               (best_epoch, main_domain, accurracy, precision, recall, f1), file=print_to)
 
+    location = {'cuda:' + str(opt.gpu): 'cuda:' + str(opt.gpu)} if opt.gpu != -1 else 'cpu'
+    model = torch.load(best_model, map_location=location)
+
+    # trim
     if type(model).__name__ == 'GNIMLP':
         model.trim()
 
-    location = {'cuda:' + str(opt.gpu): 'cuda:' + str(opt.gpu)} if opt.gpu != -1 else 'cpu'
-    model_dict = torch.load(best_model, map_location=location)
-    model.load_state_dict(model_dict)
-
-
+    print('aaa')
 
 def train_ll_mnist(model, dataloaders, opt, optim):
 

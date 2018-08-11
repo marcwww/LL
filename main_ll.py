@@ -144,8 +144,7 @@ if __name__ == '__main__':
                             capacity=opt.capacity,
                             criterion=nn.CrossEntropyLoss(),
                             add_per=opt.add_per,
-                            retain_ratio=opt.retain_ratio,
-                            device=device).to(device)
+                            retain_ratio=opt.retain_ratio).to(device)
 
     utils.init_seed(opt.seed)
     utils.init_model(model)
